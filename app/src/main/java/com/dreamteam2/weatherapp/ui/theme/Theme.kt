@@ -1,4 +1,4 @@
-package com.dreamteam2.waetherapp.ui.theme
+package com.dreamteam2.weatherapp.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

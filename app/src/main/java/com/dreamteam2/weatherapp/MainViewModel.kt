@@ -1,11 +1,10 @@
-package com.dreamteam2.waetherapp
+package com.dreamteam2.weatherapp
 
-import com.dreamteam2.weatherapp.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
-class ViewModel: ViewModel() {
+class MainViewModel: ViewModel() {
     var gridPointEndpoints: GridPointEndpoints = GridPointEndpoints()
 
     fun getGirdEndpoints() = viewModelScope.launch {

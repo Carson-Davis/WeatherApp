@@ -1,4 +1,4 @@
-package com.dreamteam2.waetherapp.ui.theme
+package com.dreamteam2.weatherapp.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes
