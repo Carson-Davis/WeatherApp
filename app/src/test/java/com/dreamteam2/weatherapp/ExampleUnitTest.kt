@@ -1,4 +1,4 @@
-package com.dreamteam2.waetherapp
+package com.dreamteam2.weatherapp
 
 import org.junit.Test
 

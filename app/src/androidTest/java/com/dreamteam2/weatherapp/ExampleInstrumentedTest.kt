@@ -1,4 +1,4 @@
-package com.dreamteam2.waetherapp
+package com.dreamteam2.weatherapp
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
