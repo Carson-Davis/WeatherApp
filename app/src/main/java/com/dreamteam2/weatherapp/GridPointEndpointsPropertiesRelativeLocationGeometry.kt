@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Geometry(
+data class GridPointEndpointsPropertiesRelativeLocationGeometry(
     @SerialName("type")
     var type: String? = "",
     @SerialName("coordinates")

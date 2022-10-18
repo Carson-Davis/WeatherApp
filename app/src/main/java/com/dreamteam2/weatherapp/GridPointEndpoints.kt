@@ -8,11 +8,11 @@ data class GridPointEndpoints(
     @SerialName("id")
     var id: String? = "",
     @SerialName("properties")
-    var properties: Properties,
+    var properties: GridPointEndpointsProperties,
     @SerialName("type")
     var type: String? = "",
     @SerialName("geometry")
-    var geometry: Geometry? = Geometry()
+    var geometry: GridPointEndpointsPropertiesRelativeLocationGeometry? = GridPointEndpointsPropertiesRelativeLocationGeometry()
 //    ignoring @context
 //    @SerialName("@context")
 //    var context: ArrayList<String> = arrayListOf(),

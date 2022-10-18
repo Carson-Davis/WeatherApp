@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Distance(
+data class GridPointEndpointsPropertiesRelativeLocationPropertiesDistance(
     @SerialName("unitCode")
     var unitCode: String? = null,
     @SerialName("value")
