@@ -5,14 +5,15 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GridPointEndpoints(
-    @SerialName("@context")
-    var context: ArrayList<String> = arrayListOf(),
     @SerialName("id")
-    var id: String? = null,
-    @SerialName("type")
-    var type: String? = null,
-    @SerialName("geometry")
-    var geometry: Geometry? = Geometry(),
+    var id: String? = "",
     @SerialName("properties")
-    var properties: Properties? = Properties()
+    var properties: Properties,
+    @SerialName("type")
+    var type: String? = "",
+    @SerialName("geometry")
+    var geometry: Geometry? = Geometry()
+//    ignoring @context
+//    @SerialName("@context")
+//    var context: ArrayList<String> = arrayListOf(),
 )

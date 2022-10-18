@@ -6,37 +6,37 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Properties(
     @SerialName("@id")
-    var id: String? = null,
+    var id: String? = "",
     @SerialName("@type")
-    var type: String? = null,
+    var type: String? = "",
     @SerialName("cwa")
-    var cwa: String? = null,
+    var cwa: String? = "",
     @SerialName("forecastOffice")
-    var forecastOffice: String? = null,
+    var forecastOffice: String? = "",
     @SerialName("gridId")
-    var gridId: String? = null,
+    var gridId: String? = "",
     @SerialName("gridX")
-    var gridX: Int? = null,
+    var gridX: Int? = 0,
     @SerialName("gridY")
-    var gridY: Int? = null,
+    var gridY: Int? = 0,
     @SerialName("forecast")
-    var forecast: String? = null,
+    var forecast: String? = "",
     @SerialName("forecastHourly")
-    var forecastHourly: String? = null,
+    var forecastHourly: String? = "",
     @SerialName("forecastGridData")
-    var forecastGridData: String? = null,
+    var forecastGridData: String? = "",
     @SerialName("observationStations")
-    var observationStations: String? = null,
+    var observationStations: String? = "",
+    @SerialName("forecastZone")
+    var forecastZone: String? = "",
+    @SerialName("county")
+    var county: String? = "",
+    @SerialName("fireWeatherZone")
+    var fireWeatherZone: String? = "",
+    @SerialName("timeZone")
+    var timeZone: String? = "",
+    @SerialName("radarStation")
+    var radarStation: String? = "",
     @SerialName("relativeLocation")
     var relativeLocation: RelativeLocation? = RelativeLocation(),
-    @SerialName("forecastZone")
-    var forecastZone: String? = null,
-    @SerialName("county")
-    var county: String? = null,
-    @SerialName("fireWeatherZone")
-    var fireWeatherZone: String? = null,
-    @SerialName("timeZone")
-    var timeZone: String? = null,
-    @SerialName("radarStation")
-    var radarStation: String? = null
 )

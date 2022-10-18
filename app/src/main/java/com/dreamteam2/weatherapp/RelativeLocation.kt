@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RelativeLocation(
     @SerialName("type")
-    var type: String? = null,
+    var type: String? = "",
     @SerialName("geometry")
     var geometry: Geometry? = Geometry(),
     @SerialName("properties")
-    var properties: Properties? = Properties()
+    var RelativeLocationProperties: RelativeLocationProperties? = RelativeLocationProperties()
 )
