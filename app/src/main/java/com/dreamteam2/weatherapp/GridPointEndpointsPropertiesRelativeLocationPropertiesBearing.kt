@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Bearing(
+data class GridPointEndpointsPropertiesRelativeLocationPropertiesBearing(
     @SerialName("unitCode")
     var unitCode: String? = null,
     @SerialName("value")

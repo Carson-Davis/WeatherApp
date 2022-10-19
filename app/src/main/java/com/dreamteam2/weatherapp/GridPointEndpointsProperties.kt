@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Properties(
+data class GridPointEndpointsProperties(
     @SerialName("@id")
     var id: String? = "",
     @SerialName("@type")
@@ -38,5 +38,5 @@ data class Properties(
     @SerialName("radarStation")
     var radarStation: String? = "",
     @SerialName("relativeLocation")
-    var relativeLocation: RelativeLocation? = RelativeLocation(),
+    var relativeLocation: GridPointEndpointsPropertiesRelativeLocation? = GridPointEndpointsPropertiesRelativeLocation(),
 )
