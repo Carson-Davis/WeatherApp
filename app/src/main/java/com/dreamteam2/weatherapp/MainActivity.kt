@@ -16,6 +16,7 @@ import com.dreamteam2.weatherapp.ui.theme.WeatherAppTheme
 
 class MainActivity : ComponentActivity() {
     val viewModel: MainViewModel = MainViewModel()
+    val secondView: MainViewModel = MainViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     Greeting(viewModel)
+                    currTemperature(viewModel)
                 }
             }
         }
@@ -38,10 +40,25 @@ fun Greeting(viewModel: MainViewModel) {
 //    status?.let{
 //        Text(text = it.status)
 //    }?: Text(text = "Loading...")
-
+/*
     val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
     gridPointEndpoints?.let{
         Text(text = it.properties.radarStation.toString())
     }?: Text(text = "Loading...")
+*/
+
+
+
 
 }
+
+@Composable
+fun currTemperature(viewModel: MainViewModel) {
+
+    val foreCastPointEndpointTemperature by viewModel.forecastEndPoints.collectAsState()
+    foreCastPointEndpointTemperature?.let{
+        Text(text = it.propertiesInForecast?.period.toString())
+    }?: Text(text = "Loading...")
+
+}
+

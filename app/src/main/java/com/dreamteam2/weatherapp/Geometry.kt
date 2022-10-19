@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 data class Geometry(
     @SerialName("type")
     var type: String? = "",
-    @SerialName("coordinates")
-    var coordinates: ArrayList<Double> = arrayListOf()
+    //@SerialName("coordinates")
+    //var coordinates: List<List<Double>> = arrayListOf()
 )
