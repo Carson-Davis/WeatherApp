@@ -9,7 +9,7 @@ data class ForecastEndpoints(
     @SerialName("type")
     var properties: String? = "",
     @SerialName("geometry")
-    var geometry: Geometry? = Geometry(),
+    var geometry: GridPointEndpointsPropertiesRelativeLocationGeometry? = GridPointEndpointsPropertiesRelativeLocationGeometry(),
     //@SerialName("coordinates")
     //var coordinates: List<List<Double>>? = emptyList(),
     @SerialName("properties")
