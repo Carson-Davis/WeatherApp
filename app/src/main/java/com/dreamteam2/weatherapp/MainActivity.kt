@@ -3,6 +3,7 @@ package com.dreamteam2.weatherapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -54,11 +55,14 @@ fun Greeting(viewModel: MainViewModel) {
 
 @Composable
 fun currTemperature(viewModel: MainViewModel) {
-
+    //for (i in 0..13){
     val foreCastPointEndpointTemperature by viewModel.forecastEndPoints.collectAsState()
-    foreCastPointEndpointTemperature?.let{
-        Text(text = it.propertiesInForecast?.period.toString())
-    }?: Text(text = "Loading...")
-
+    Column() {
+        foreCastPointEndpointTemperature?.let {
+            for (i in 0..13) {
+                Text(text = "Day " + i + ": " + it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F")
+            }
+        } ?: Text(text = "Loading...")
+    }
 }
 
