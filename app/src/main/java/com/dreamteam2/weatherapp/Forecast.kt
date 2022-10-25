@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ForecastEndpoints(
+data class Forecast(
 
     @SerialName("type")
     var properties: String? = "",
