@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dreamteam2.weatherapp.ui.theme.WeatherAppTheme
+import kotlin.math.roundToInt
 
 
 class MainActivity : ComponentActivity() {
@@ -72,13 +73,12 @@ fun dailyForecast(viewModel: MainViewModel) {
     }
 }
 
-
 @Composable
 fun today(viewModel: MainViewModel){
     val forecastHourly by viewModel.forecastHourly.collectAsState()
     val gridpointProperties by viewModel.gridpointsProperties.collectAsState()
     val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
-    Column(modifier = Modifier.absoluteOffset(0.dp, 30.dp)){
+    Column(modifier = Modifier.absoluteOffset(0.dp, 30.dp)) {
         Text(
             text = "City: " + gridPointEndpoints?.properties?.relativeLocation.toString(),
             //text = "Minnesooota",
@@ -102,16 +102,86 @@ fun today(viewModel: MainViewModel){
         )
 
         Row(
-            modifier = Modifier.padding(0.dp)
-        ){
+            modifier = Modifier.padding(0.dp).align(alignment = Alignment.CenterHorizontally)
+        ) {
+            var minTemp: Double? =
+                gridpointProperties?.properties?.minTemperature?.values?.get(0)?.value
+            var minTempString: String
+            if (minTemp == null) {
+                minTempString = "Loading"
+            } else {
+                minTempString = (minTemp * 1.8 + 32).toString()
+            }
+
+            var maxTemp: Double? =
+                gridpointProperties?.properties?.maxTemperature?.values?.get(0)?.value
+            var maxTempString: String
+            if (maxTemp == null) {
+                maxTempString = "Loading"
+            } else {
+                maxTempString = (maxTemp * 1.8 + 32).toString()
+            }
             Text(
-                text = "H: " + gridpointProperties?.properties?.minTemperature?.values?.get(0)?.value.toString().subSequence(0, 1) + "°",
-                modifier = Modifier.offset(15.dp, 0.dp))
+                text = "H: " + maxTempString + "°           "//,
+                //modifier = Modifier.offset(15.dp, 0.dp))
+
+                //.subSequence(0, 1)
+            )
             Text(
-                text = "L: " + gridpointProperties?.properties?.maxTemperature?.values?.get(0)?.value.toString().subSequence(0, 1) + "°",
-                modifier = Modifier.offset(45.dp, 0.dp)
+                text = "L: " + minTempString + "°"//,
+                //modifier = Modifier.offset(45.dp, 0.dp)
             )
         }
+        var aTemp: Double? =
+            gridpointProperties?.properties?.apparentTemperature?.values?.get(0)?.value
+        var aTempString: String
+        if (aTemp == null) {
+            aTempString = "Loading"
+        } else {
+            aTempString = (aTemp * 1.8 + 32).toString()
+        }
+        Text(
+            text = "Feels Like: " + aTempString + "°F",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
+            fontSize = 20.sp
+
+        )
+        var windS: Double? = gridpointProperties?.properties?.windSpeed?.values?.get(0)?.value
+        var windSString: String
+        if (windS == null){
+            windSString = "Loading"
+        }else{
+            windSString = ((windS * 0.621371192).roundToInt()).toString()
+        }
+        var windD: Double? = gridpointProperties?.properties?.windDirection?.values?.get(0)?.value
+        var windDString: String
+        if (aTemp == null) {
+            windDString = "Loading"
+        }else if (22.0 < windD!! && windD!! <  68.0){
+            windDString = "NE"
+        }else if (67.0 < windD!! && windD!! <  113.0){
+            windDString = "E"
+        }else if (112.0 < windD!! && windD!! <  158.0){
+            windDString = "SE"
+        }else if (157.0 < windD!! && windD!! <  203.0){
+            windDString = "S"
+        }else if (202.0 < windD!! && windD!! <  248.0){
+            windDString = "SW"
+        }else if (247.0 < windD!! && windD!! <  293.0){
+            windDString = "W"
+        }else if (292.0 < windD!! && windD!! <  338.0){
+            windDString = "NW"
+        }else{
+            windDString = "N"
+        }
+        Text(
+            text = "Wind: " + windSString + " mph " + windDString,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
+            fontSize = 20.sp
+
+        )
         //Text(text = "Humidity: %" + gridpointProperties?.properties?.relativeHumidity?.values?.get(0)?.value.toString())
        // Text(text = "Dewpoint: %" + gridpointProperties?.properties?.dewpoint?.values?.get(0)?.value.toString())
         //Text(text = "Cloud Coverage: %" + gridpointProperties?.properties?.skyCover?.values?.get(0)?.value.toString())
