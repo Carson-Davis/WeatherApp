@@ -49,8 +49,8 @@ class MainActivity : ComponentActivity() {
                     ) {
 
                         today(viewModel)
-                        dailyForecast(viewModel = viewModel)
                         hourly(viewModel = viewModel)
+                        dailyForecast(viewModel = viewModel)
                     }
 
 
@@ -64,10 +64,15 @@ class MainActivity : ComponentActivity() {
 fun dailyForecast(viewModel: MainViewModel) {
     //for (i in 0..13){
     val foreCastPointEndpointTemperature by viewModel.forecast.collectAsState()
-    Column(modifier = Modifier.absoluteOffset(0.dp, 300.dp)) {
+    Column(
+        modifier = Modifier.padding(horizontal = 0.dp, vertical = 20.dp)
+    ) {
         foreCastPointEndpointTemperature?.let {
             for (i in 0..13) {
-                Text(text = it.propertiesInForecast?.period?.get(i)?.name.toString() + ": " + it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F")
+                Text(text = it.propertiesInForecast?.period?.get(i)?.name.toString() + ": " + it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                )
             }
         } ?: Text(text = "Loading...")
     }
@@ -78,7 +83,9 @@ fun today(viewModel: MainViewModel){
     val forecastHourly by viewModel.forecastHourly.collectAsState()
     val gridpointProperties by viewModel.gridpointsProperties.collectAsState()
     val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
-    Column(modifier = Modifier.absoluteOffset(0.dp, 30.dp)) {
+    Column(
+        modifier = Modifier.padding(horizontal = 0.dp, vertical = 20.dp)
+    ) {
         Text(
             text = "City: " + gridPointEndpoints?.properties?.relativeLocation.toString(),
             //text = "Minnesooota",
@@ -185,17 +192,38 @@ fun today(viewModel: MainViewModel){
         //Text(text = "Humidity: %" + gridpointProperties?.properties?.relativeHumidity?.values?.get(0)?.value.toString())
        // Text(text = "Dewpoint: %" + gridpointProperties?.properties?.dewpoint?.values?.get(0)?.value.toString())
         //Text(text = "Cloud Coverage: %" + gridpointProperties?.properties?.skyCover?.values?.get(0)?.value.toString())
-
+        if(!(gridpointProperties?.properties?.potentialOf50mphWindGusts?.values.isNullOrEmpty())){
+            Text(text = "Wind Advisory: " + gridpointProperties?.properties?.potentialOf50mphWindGusts?.values)
+        }
     }
 }
 
 @Composable
 fun hourly(viewModel: MainViewModel){
     val forecastHourly by viewModel.forecastHourly.collectAsState()
-    Column(modifier = Modifier.absoluteOffset(0.dp, 500.dp)) {
+    Column(
+        modifier = Modifier.padding(horizontal = 0.dp, vertical = 20.dp)
+    ) {
         forecastHourly?.let {
             for (i in 0..13) {
-                Text(text = it.propertiesInForecast?.period?.get(i)?.startTime.toString() + ": " + it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F")
+                var allTimeStuff: String = it.propertiesInForecast?.period?.get(i)?.startTime.toString()
+                var ending = "am"
+                allTimeStuff = allTimeStuff.substring(11, 13)
+                if(allTimeStuff.toInt() > 11){
+                    ending = "pm"
+                }
+                if(allTimeStuff.toInt() % 12 == 0){
+                    allTimeStuff = "12"
+                }
+                else
+                {
+                    allTimeStuff = (allTimeStuff.toInt() % 12).toString()
+                }
+                Text(text = allTimeStuff + ":00 " + ending + ": " + it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                )
+
             }
         } ?: Text(text = "Loading...")
     }
