@@ -218,7 +218,7 @@ fun hourly(viewModel: MainViewModel){
                 .background(Color.Cyan, shape = RoundedCornerShape(25.dp))
                 .horizontalScroll(rememberScrollState())
 
-            ){
+        //    ){
 
          */
     var primaryBlue = Color(66,185,249)
