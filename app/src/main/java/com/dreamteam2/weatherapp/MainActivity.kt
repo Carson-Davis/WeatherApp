@@ -263,7 +263,7 @@ fun hourly(viewModel: MainViewModel){
 
                             }
                             Row(modifier = Modifier.padding(0.dp)) {
-                                Text(text = it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F",
+                                Text(text = it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F   ",
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier.offset(5.dp, 0.dp),
                                     fontSize = 24.sp
