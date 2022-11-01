@@ -1,11 +1,13 @@
 package com.dreamteam2.weatherapp
 
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 
 import androidx.compose.material.MaterialTheme
@@ -17,6 +19,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.GenericFontFamily
@@ -41,19 +46,18 @@ class MainActivity : ComponentActivity() {
 
                 ) {
 
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                            .verticalScroll(rememberScrollState()),
+                    Column(modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
                         horizontalAlignment = Alignment.CenterHorizontally
 
                     ) {
-
                         today(viewModel)
                         hourly(viewModel = viewModel)
+
+
                         dailyForecast(viewModel = viewModel)
                     }
-
-
                 }
             }
         }
@@ -90,7 +94,8 @@ fun today(viewModel: MainViewModel){
             text = "City: " + gridPointEndpoints?.properties?.relativeLocation.toString(),
             //text = "Minnesooota",
             textAlign = TextAlign.Center,
-            modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+            modifier = Modifier
+                .align(alignment = Alignment.CenterHorizontally)
                 .offset(-6.dp, 0.dp)
         )
         Text(
@@ -109,7 +114,9 @@ fun today(viewModel: MainViewModel){
         )
 
         Row(
-            modifier = Modifier.padding(0.dp).align(alignment = Alignment.CenterHorizontally)
+            modifier = Modifier
+                .padding(0.dp)
+                .align(alignment = Alignment.CenterHorizontally)
         ) {
             var minTemp: Double? =
                 gridpointProperties?.properties?.minTemperature?.values?.get(0)?.value
@@ -201,30 +208,77 @@ fun today(viewModel: MainViewModel){
 @Composable
 fun hourly(viewModel: MainViewModel){
     val forecastHourly by viewModel.forecastHourly.collectAsState()
-    Column(
-        modifier = Modifier.padding(horizontal = 0.dp, vertical = 20.dp)
-    ) {
-        forecastHourly?.let {
-            for (i in 0..13) {
-                var allTimeStuff: String = it.propertiesInForecast?.period?.get(i)?.startTime.toString()
-                var ending = "am"
-                allTimeStuff = allTimeStuff.substring(11, 13)
-                if(allTimeStuff.toInt() > 11){
-                    ending = "pm"
-                }
-                if(allTimeStuff.toInt() % 12 == 0){
-                    allTimeStuff = "12"
-                }
-                else
-                {
-                    allTimeStuff = (allTimeStuff.toInt() % 12).toString()
-                }
-                Text(text = allTimeStuff + ":00 " + ending + ": " + it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
-                )
+    //Column(
+       // modifier = Modifier.padding(horizontal = 0.dp, vertical = 20.dp)
+    //) {
+        /*
+        Box(
+            modifier = Modifier
+                .size(300.dp, 180.dp)
+                .background(Color.Cyan, shape = RoundedCornerShape(25.dp))
+                .horizontalScroll(rememberScrollState())
 
+        //    ){
+
+         */
+    var primaryBlue = Color(66,185,249)
+    Row( modifier = Modifier
+                .size(360.dp, 110.dp)
+                .background(primaryBlue, shape = RoundedCornerShape(25.dp))
+                .horizontalScroll(rememberScrollState())
+                .offset(0.dp, 3.dp)
+                .padding(10.dp)
+                .alpha(1.0F)
+
+
+            ) {
+                forecastHourly?.let {
+                    for (i in 0..13) {
+                        var allTimeStuff: String = it.propertiesInForecast?.period?.get(i)?.startTime.toString()
+                        var ending = "AM"
+                        allTimeStuff = allTimeStuff.substring(11, 13)
+                        if(allTimeStuff.toInt() > 11){
+                            ending = "PM"
+                        }
+                        if(allTimeStuff.toInt() % 12 == 0){
+                            allTimeStuff = "12"
+                        }
+                        else
+                        {
+                            allTimeStuff = (allTimeStuff.toInt() % 12).toString()
+                        }
+                        Column() {
+                            Row(modifier = Modifier.padding(7.dp)) {
+                                Text(text = "$allTimeStuff",
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 24.sp
+                                )
+                                Text(text = "$ending",
+                                    //textAlign = TextAlign.Center,
+                                    fontSize = 15.sp,
+                                    modifier = Modifier.offset(0.dp, 9.dp)
+                                )
+
+
+
+                            }
+                            Row(modifier = Modifier.padding(0.dp)) {
+                                Text(text = it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F",
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.offset(5.dp, 0.dp),
+                                    fontSize = 24.sp
+                                )
+                            }
+                        }
+                        /*
+                        Text(text = allTimeStuff + ":00 " + ending + ": " + it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F",
+                            textAlign = TextAlign.Center,
+                            //modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                        )
+                        */
+                    }
+                } ?: Text(text = "Loading...")
             }
-        } ?: Text(text = "Loading...")
-    }
+       // }
+   // }
 }
