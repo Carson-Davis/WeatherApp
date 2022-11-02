@@ -49,13 +49,13 @@ class MainActivity : ComponentActivity() {
                     Column(modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState()),
+
                         horizontalAlignment = Alignment.CenterHorizontally
 
                     ) {
                         today(viewModel)
                         hourly(viewModel = viewModel)
-
-
+                        Spacer(modifier = Modifier.height(30.dp))
                         dailyForecast(viewModel = viewModel)
                     }
                 }
@@ -68,17 +68,55 @@ class MainActivity : ComponentActivity() {
 fun dailyForecast(viewModel: MainViewModel) {
     //for (i in 0..13){
     val foreCastPointEndpointTemperature by viewModel.forecast.collectAsState()
-    Column(
-        modifier = Modifier.padding(horizontal = 0.dp, vertical = 20.dp)
+    Row(
+        modifier = Modifier
+            .size(360.dp, 400.dp)
+            .background(Color.Cyan, shape = RoundedCornerShape(25.dp))
+            .horizontalScroll(rememberScrollState())
+            .offset(0.dp, 0.dp)
+            .padding(25.dp)
+            .alpha(1.0F)
+            .verticalScroll(rememberScrollState())
     ) {
-        foreCastPointEndpointTemperature?.let {
-            for (i in 0..13) {
-                Text(text = it.propertiesInForecast?.period?.get(i)?.name.toString() + ": " + it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
-                )
+        Column(
+            //horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier.offset(45.dp, 0.dp),
+
+        ) {
+            foreCastPointEndpointTemperature?.let {
+                for (i in 0..13) {
+                    Text(
+                        text = it.propertiesInForecast?.period?.get(i)?.name.toString(),
+                        fontSize = 19.sp
+                        //textAlign = TextAlign.Center,
+                        //modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                    )
+                    Divider(color = Color.Red, thickness = 4.dp)
+                } //For loop bracket
+
+            } ?: Text(text = "Loading...")
+        }
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.offset(90.dp, 0.dp),
+                                    //.padding(.dp)
+                verticalArrangement = Arrangement.spacedBy(3.dp)
+            ) {
+                foreCastPointEndpointTemperature?.let {
+                    for (i in 0..13) {
+                        Text(
+                            text = it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F",
+                            textAlign = TextAlign.Center,
+                            fontSize = 20.sp
+                        )
+                        Divider(color = Color.Red, thickness = 1.dp)
+                    } //For loop bracket
+                } ?: Text(text = "Loading...")
+
             }
-        } ?: Text(text = "Loading...")
+
     }
 }
 
@@ -223,12 +261,12 @@ fun hourly(viewModel: MainViewModel){
          */
     var primaryBlue = Color(66,185,249)
     Row( modifier = Modifier
-                .size(360.dp, 110.dp)
-                .background(primaryBlue, shape = RoundedCornerShape(25.dp))
-                .horizontalScroll(rememberScrollState())
-                .offset(0.dp, 3.dp)
-                .padding(10.dp)
-                .alpha(1.0F)
+        .size(360.dp, 110.dp)
+        .background(primaryBlue, shape = RoundedCornerShape(25.dp))
+        .horizontalScroll(rememberScrollState())
+        .offset(0.dp, 3.dp)
+        .padding(10.dp)
+        .alpha(1.0F)
 
 
             ) {
