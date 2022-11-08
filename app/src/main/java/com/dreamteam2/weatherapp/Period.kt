@@ -20,7 +20,7 @@ data class Period(
     @SerialName("temperatureUnit")
     var temperatureUnit: String? = "",
     @SerialName("temperatureTrend")
-    var temperatureTrend: Boolean? = null,
+    var temperatureTrend: String? = null,
     @SerialName("windSpeed")
     var windSpeed: String? = "",
     @SerialName("windDirection")
