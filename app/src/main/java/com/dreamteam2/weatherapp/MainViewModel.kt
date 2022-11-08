@@ -20,7 +20,7 @@ class MainViewModel: ViewModel() {
         viewModelScope.launch {
             kotlin.runCatching {
                // weatherApi.getForecast(31, 80)
-                weatherApi.getGirdEndpoints(45.5648,94.3180)
+                weatherApi.getGirdEndpoints(39.0473,-95.6752)
             }.onSuccess {
                 gridPointEndpoints.value = it
             }.onFailure {
@@ -28,7 +28,7 @@ class MainViewModel: ViewModel() {
             }
 
             kotlin.runCatching {
-                weatherApi.getForecast(31, 80)
+                weatherApi.getForecast("TOP", 31, 80) // TOP 31 80 vw MPX 72 98
             }.onSuccess {
                 forecast.value = it
             }.onFailure {
@@ -36,7 +36,7 @@ class MainViewModel: ViewModel() {
             }
 
             kotlin.runCatching {
-                weatherApi.getForecastHourly(31, 80)
+                weatherApi.getForecastHourly("TOP", 31, 80)
             }.onSuccess {
                 forecastHourly.value = it
             }.onFailure {
@@ -44,7 +44,7 @@ class MainViewModel: ViewModel() {
             }
 
             kotlin.runCatching {
-                weatherApi.getGridpointProperties(31, 80)
+                weatherApi.getGridpointProperties("TOP", 31, 80)
             }.onSuccess {
                 gridpointsProperties.value = it
             }.onFailure {

@@ -60,30 +60,30 @@ class WeatherApi {
     }
 
     @Throws(Exception::class)
-    suspend fun getForecast(x: Int, y: Int): Forecast {
+    suspend fun getForecast(cwa: String, x: Int, y: Int): Forecast {
         val foreCast: Forecast = httpClient.get {
             url {
-                appendPathSegments("gridpoints", "TOP", "$x,$y", "forecast")
+                appendPathSegments("gridpoints", cwa, "$x,$y", "forecast")
             }
         }.body()
         return foreCast
     }
 
     @Throws(Exception::class)
-    suspend fun getForecastHourly(x: Int, y: Int): Forecast {
+    suspend fun getForecastHourly(cwa: String, x: Int, y: Int): Forecast {
         val foreCast: Forecast = httpClient.get {
             url {
-                appendPathSegments("gridpoints", "TOP", "$x,$y", "forecast", "hourly")
+                appendPathSegments("gridpoints", cwa, "$x,$y", "forecast", "hourly")
             }
         }.body()
         return foreCast
     }
 
     @Throws(Exception::class)
-    suspend fun getGridpointProperties(x: Int, y: Int): Gridpoints {
+    suspend fun getGridpointProperties(cwa: String, x: Int, y: Int): Gridpoints {
         val gridpointsProperties: Gridpoints = httpClient.get {
             url {
-                appendPathSegments("gridpoints", "TOP", "$x,$y")
+                appendPathSegments("gridpoints", cwa, "$x,$y")
             }
         }.body()
         return gridpointsProperties

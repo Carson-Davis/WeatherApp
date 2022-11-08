@@ -8,7 +8,7 @@ data class GridPointEndpoints(
     @SerialName("id")
     var id: String? = "",
     @SerialName("properties")
-    var properties: GridPointEndpointsProperties,
+    var properties: GridPointEndpointsProperties? = GridPointEndpointsProperties(),
     @SerialName("type")
     var type: String? = "",
     @SerialName("geometry")

@@ -48,15 +48,16 @@ class MainActivity : ComponentActivity() {
 
                     Column(modifier = Modifier
                         .fillMaxSize()
+                        //.background(Color.Red)  //COME BACK HERE
                         .verticalScroll(rememberScrollState()),
 
                         horizontalAlignment = Alignment.CenterHorizontally
 
                     ) {
                         today(viewModel)
-                        hourly(viewModel = viewModel)
+                        hourly(viewModel)
                         Spacer(modifier = Modifier.height(30.dp))
-                        dailyForecast(viewModel = viewModel)
+                        dailyForecast(viewModel)
                     }
                 }
             }
@@ -129,7 +130,7 @@ fun today(viewModel: MainViewModel){
         modifier = Modifier.padding(horizontal = 0.dp, vertical = 20.dp)
     ) {
         Text(
-            text = "City: " + gridPointEndpoints?.properties?.relativeLocation.toString(),
+            text = "City: " + gridPointEndpoints?.properties?.relativeLocation?.properties?.city.toString() + ", " + gridPointEndpoints?.properties?.relativeLocation?.properties?.state.toString(),
             //text = "Minnesooota",
             textAlign = TextAlign.Center,
             modifier = Modifier
