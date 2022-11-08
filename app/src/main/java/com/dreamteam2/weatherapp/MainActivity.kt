@@ -185,11 +185,17 @@ fun today2(viewModel: MainViewModel){
     val forecastHourly by viewModel.forecastHourly.collectAsState()
     val gridpointProperties by viewModel.gridpointsProperties.collectAsState()
     val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
-    Row(){
+    Row(
+        modifier = Modifier
+                .height(IntrinsicSize.Max)
+    ){
         Column(
-            modifier = Modifier.size(130.dp, 100.dp)
+            modifier = Modifier.width(130.dp)
                 //.align(alignment = Alignment.CenterVertically)
-                .offset(0.dp, 12.dp)
+                //.offset(0.dp, 12.dp)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center,
+
         ) {
             Text(
                 text = forecastHourly?.propertiesInForecast?.period?.get(0)?.temperature.toString() + "°",
@@ -200,14 +206,14 @@ fun today2(viewModel: MainViewModel){
             )
         }
         Column(
-            modifier = Modifier.size(220.dp, 139.dp)
+            modifier = Modifier.width(220.dp)
         ) {
             Row(
 
         ) {
                 Text(
                     text = forecastHourly?.propertiesInForecast?.period?.get(0)?.shortForecast.toString(),
-                    textAlign = TextAlign.Center,
+                    //textAlign = TextAlign.Center,
                     modifier = Modifier,
                     fontSize = 34.sp,
                     //fontStyle = GenericFontFamily("monospace")
