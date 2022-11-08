@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.GenericFontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -235,9 +236,27 @@ fun today(viewModel: MainViewModel){
             fontSize = 20.sp
 
         )
-        //Text(text = "Humidity: %" + gridpointProperties?.properties?.relativeHumidity?.values?.get(0)?.value.toString())
-       // Text(text = "Dewpoint: %" + gridpointProperties?.properties?.dewpoint?.values?.get(0)?.value.toString())
-        //Text(text = "Cloud Coverage: %" + gridpointProperties?.properties?.skyCover?.values?.get(0)?.value.toString())
+        Text(text = "Humidity: " + gridpointProperties?.properties?.relativeHumidity?.values?.get(0)?.value.toString()+"%" ,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
+            fontSize = 20.sp)
+
+        var dewpoint: Double? =
+            gridpointProperties?.properties?.dewpoint?.values?.get(0)?.value
+        var dewpointString: String
+        if (dewpoint == null) {
+            dewpointString = "Loading"
+        } else {
+            dewpointString = (dewpoint * 1.8 + 32).toString()
+        }
+        Text(text = "Dewpoint: " + dewpointString+" °F",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
+            fontSize = 20.sp)
+        Text(text = "Cloud Coverage: " + gridpointProperties?.properties?.skyCover?.values?.get(0)?.value.toString()+ "%",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
+            fontSize = 20.sp)
         if(!(gridpointProperties?.properties?.potentialOf50mphWindGusts?.values.isNullOrEmpty())){
             Text(text = "Wind Advisory: " + gridpointProperties?.properties?.potentialOf50mphWindGusts?.values)
         }
@@ -286,11 +305,16 @@ fun hourly(viewModel: MainViewModel){
                         {
                             allTimeStuff = (allTimeStuff.toInt() % 12).toString()
                         }
+                        if(i == 0){
+                            ending = ""
+                            allTimeStuff = "Now"
+                        }
                         Column() {
                             Row(modifier = Modifier.padding(7.dp)) {
                                 Text(text = "$allTimeStuff",
                                     textAlign = TextAlign.Center,
                                     fontSize = 24.sp
+                                    //fontWeight = FontWeight.Bold
                                 )
                                 Text(text = "$ending",
                                     //textAlign = TextAlign.Center,
