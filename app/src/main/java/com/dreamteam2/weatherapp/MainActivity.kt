@@ -55,16 +55,37 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally
 
                     ) {
-                        today(viewModel)
+                        Spacer(modifier = Modifier.height(20.dp))
+                        city(viewModel)
+                        Spacer(modifier = Modifier.height(20.dp))
                         hourly(viewModel)
-                        Spacer(modifier = Modifier.height(30.dp))
+                        Spacer(modifier = Modifier.height(15.dp))
+                        today2(viewModel)
+                        Spacer(modifier = Modifier.height(15.dp))
                         dailyForecast(viewModel)
+                        Spacer(modifier = Modifier.height(15.dp))
+                        bottom(viewModel)
                     }
                 }
             }
         }
     }
 }
+
+@Composable
+fun city(viewModel: MainViewModel){
+    val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
+    Text(
+        text = gridPointEndpoints?.properties?.relativeLocation?.properties?.city.toString() + ", " + gridPointEndpoints?.properties?.relativeLocation?.properties?.state.toString(),
+        //text = "Minnesooota",
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            //.align(alignment = Alignment.CenterHorizontally)
+            .offset(-6.dp, 0.dp),
+        fontSize = 30.sp
+    )
+}
+
 
 @Composable
 fun dailyForecast(viewModel: MainViewModel) {
@@ -123,6 +144,166 @@ fun dailyForecast(viewModel: MainViewModel) {
 }
 
 @Composable
+fun bottom(viewModel: MainViewModel){
+    val gridpointProperties by viewModel.gridpointsProperties.collectAsState()
+    Row(){
+
+        Text(text = "Humidity: " + gridpointProperties?.properties?.relativeHumidity?.values?.get(0)?.value.toString()+"%" ,
+            textAlign = TextAlign.Center,
+            modifier = Modifier,
+            fontSize = 20.sp)
+
+        var dewpoint: Double? =
+            gridpointProperties?.properties?.dewpoint?.values?.get(0)?.value
+        var dewpointString: String
+        if (dewpoint == null) {
+            dewpointString = "Loading"
+        } else {
+            dewpointString = (dewpoint * 1.8 + 32).toString()
+        }
+        /*
+        Text(text = "Dewpoint: " + dewpointString+" °F",
+            textAlign = TextAlign.Center,
+            modifier = Modifier,
+            fontSize = 20.sp)
+            */
+
+        if(!(gridpointProperties?.properties?.potentialOf50mphWindGusts?.values.isNullOrEmpty())){
+            Text(text = "Wind Advisory: " + gridpointProperties?.properties?.potentialOf50mphWindGusts?.values)
+        }
+    }
+    Row(){
+        Text(text = "Cloud Coverage: " + gridpointProperties?.properties?.skyCover?.values?.get(0)?.value.toString()+ "%",
+            textAlign = TextAlign.Center,
+            modifier = Modifier,
+            fontSize = 20.sp)
+    }
+}
+
+@Composable
+fun today2(viewModel: MainViewModel){
+    val forecastHourly by viewModel.forecastHourly.collectAsState()
+    val gridpointProperties by viewModel.gridpointsProperties.collectAsState()
+    val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
+    Row(){
+        Column(
+            modifier = Modifier.size(130.dp, 100.dp)
+                //.align(alignment = Alignment.CenterVertically)
+                .offset(0.dp, 12.dp)
+        ) {
+            Text(
+                text = forecastHourly?.propertiesInForecast?.period?.get(0)?.temperature.toString() + "°",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
+                fontSize = 70.sp,
+                //fontStyle = GenericFontFamily("monospace")
+            )
+        }
+        Column(
+            modifier = Modifier.size(220.dp, 139.dp)
+        ) {
+            Row(
+
+        ) {
+                Text(
+                    text = forecastHourly?.propertiesInForecast?.period?.get(0)?.shortForecast.toString(),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier,
+                    fontSize = 34.sp,
+                    //fontStyle = GenericFontFamily("monospace")
+                )
+            }
+            Row() {
+                var minTemp: Double? =
+                    gridpointProperties?.properties?.minTemperature?.values?.get(0)?.value
+                var minTempString: String
+                if (minTemp == null) {
+                    minTempString = "Loading"
+                } else {
+                    minTempString = (minTemp * 1.8 + 32).toString()
+                }
+
+                var maxTemp: Double? =
+                    gridpointProperties?.properties?.maxTemperature?.values?.get(0)?.value
+                var maxTempString: String
+                if (maxTemp == null) {
+                    maxTempString = "Loading"
+                } else {
+                    maxTempString = (maxTemp * 1.8 + 32).toString()
+                }
+                Text(
+                    text = "H: " + maxTempString + "°    ",
+                    //modifier = Modifier.offset(15.dp, 0.dp))
+                    fontSize = 25.sp
+                    //.subSequence(0, 1)
+                )
+                Text(
+                    text = "L: " + minTempString + "°",
+                    //modifier = Modifier.offset(45.dp, 0.dp)
+                    fontSize = 25.sp
+                )
+            }
+
+            Row() {
+                var aTemp: Double? =
+                    gridpointProperties?.properties?.apparentTemperature?.values?.get(0)?.value
+                var aTempString: String
+                if (aTemp == null) {
+                    aTempString = "Loading"
+                } else {
+                    aTempString = (aTemp * 1.8 + 32).toString()
+                }
+                Text(
+                    text = "Feels Like: " + aTempString + "°F",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier,
+                    fontSize = 20.sp
+                )
+            }
+            Row(){
+                var aTemp: Double? =
+                    gridpointProperties?.properties?.apparentTemperature?.values?.get(0)?.value
+                var windS: Double? = gridpointProperties?.properties?.windSpeed?.values?.get(0)?.value
+                var windSString: String
+                if (windS == null){
+                    windSString = "Loading"
+                }else{
+                    windSString = ((windS * 0.621371192).roundToInt()).toString()
+                }
+                var windD: Double? = gridpointProperties?.properties?.windDirection?.values?.get(0)?.value
+                var windDString: String
+                if (aTemp == null) {
+                    windDString = "Loading"
+                }else if (22.0 < windD!! && windD!! <  68.0){
+                    windDString = "NE"
+                }else if (67.0 < windD!! && windD!! <  113.0){
+                    windDString = "E"
+                }else if (112.0 < windD!! && windD!! <  158.0){
+                    windDString = "SE"
+                }else if (157.0 < windD!! && windD!! <  203.0){
+                    windDString = "S"
+                }else if (202.0 < windD!! && windD!! <  248.0){
+                    windDString = "SW"
+                }else if (247.0 < windD!! && windD!! <  293.0){
+                    windDString = "W"
+                }else if (292.0 < windD!! && windD!! <  338.0){
+                    windDString = "NW"
+                }else{
+                    windDString = "N"
+                }
+                Text(
+                    text = "Wind: " + windSString + " mph " + windDString,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier,
+                    fontSize = 20.sp
+
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun today(viewModel: MainViewModel){
     val forecastHourly by viewModel.forecastHourly.collectAsState()
     val gridpointProperties by viewModel.gridpointsProperties.collectAsState()
@@ -130,14 +311,7 @@ fun today(viewModel: MainViewModel){
     Column(
         modifier = Modifier.padding(horizontal = 0.dp, vertical = 20.dp)
     ) {
-        Text(
-            text = "City: " + gridPointEndpoints?.properties?.relativeLocation?.properties?.city.toString() + ", " + gridPointEndpoints?.properties?.relativeLocation?.properties?.state.toString(),
-            //text = "Minnesooota",
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .align(alignment = Alignment.CenterHorizontally)
-                .offset(-6.dp, 0.dp)
-        )
+
         Text(
             text = forecastHourly?.propertiesInForecast?.period?.get(0)?.temperature.toString() + "°",
             textAlign = TextAlign.Center,
