@@ -146,38 +146,67 @@ fun dailyForecast(viewModel: MainViewModel) {
 @Composable
 fun bottom(viewModel: MainViewModel){
     val gridpointProperties by viewModel.gridpointsProperties.collectAsState()
-    Row(){
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(25.dp)){
+        Column(
+            modifier = Modifier
+                .background(Color.Yellow, shape= RoundedCornerShape(25.dp))
+                .fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    text = "Humidity: " + gridpointProperties?.properties?.relativeHumidity?.values?.get(
+                        0
+                    )?.value.toString() + "%",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier,
+                    fontSize = 20.sp
 
-        Text(text = "Humidity: " + gridpointProperties?.properties?.relativeHumidity?.values?.get(0)?.value.toString()+"%" ,
-            textAlign = TextAlign.Center,
-            modifier = Modifier,
-            fontSize = 20.sp)
+                )
+            }
+            Row(
+                modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+            ) {
+                var dewpoint: Double? =
+                    gridpointProperties?.properties?.dewpoint?.values?.get(0)?.value
+                var dewpointString: String
+                if (dewpoint == null) {
+                    dewpointString = "Loading"
+                } else {
+                    dewpointString = (dewpoint * 1.8 + 32).toString()
+                }
 
-        var dewpoint: Double? =
-            gridpointProperties?.properties?.dewpoint?.values?.get(0)?.value
-        var dewpointString: String
-        if (dewpoint == null) {
-            dewpointString = "Loading"
-        } else {
-            dewpointString = (dewpoint * 1.8 + 32).toString()
-        }
-        /*
-        Text(text = "Dewpoint: " + dewpointString+" °F",
-            textAlign = TextAlign.Center,
-            modifier = Modifier,
-            fontSize = 20.sp)
-            */
-
-        if(!(gridpointProperties?.properties?.potentialOf50mphWindGusts?.values.isNullOrEmpty())){
-            Text(text = "Wind Advisory: " + gridpointProperties?.properties?.potentialOf50mphWindGusts?.values)
+                Text(
+                    text = "Dewpoint: " + dewpointString + " °F",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier,
+                    fontSize = 20.sp
+                )
+            }
+            Row(
+                modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    text = "Cloud Coverage: " + gridpointProperties?.properties?.skyCover?.values?.get(0)?.value.toString() + "%",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier,
+                    fontSize = 20.sp
+                )
+            }
+            Row(
+                modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+            ) {
+                if (!(gridpointProperties?.properties?.potentialOf50mphWindGusts?.values.isNullOrEmpty())) {
+                    Text(text = "Wind Advisory: " + gridpointProperties?.properties?.potentialOf50mphWindGusts?.values)
+                }
+            }
         }
     }
-    Row(){
-        Text(text = "Cloud Coverage: " + gridpointProperties?.properties?.skyCover?.values?.get(0)?.value.toString()+ "%",
-            textAlign = TextAlign.Center,
-            modifier = Modifier,
-            fontSize = 20.sp)
-    }
+
+
 }
 
 @Composable
