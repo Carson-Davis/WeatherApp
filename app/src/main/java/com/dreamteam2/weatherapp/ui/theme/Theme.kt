@@ -13,8 +13,8 @@ private val DarkColorPalette = darkColors(
 )
 
 private val LightColorPalette = lightColors(
-    primary = BabyBlue,
-    primaryVariant = USAFABlue,
+    primary = USAFABlue,
+    primaryVariant = BabyBlue,
     background = EggShell
 
     /* Other default colors to override

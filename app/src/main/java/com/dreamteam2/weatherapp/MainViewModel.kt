@@ -48,6 +48,14 @@ class MainViewModel: ViewModel() {
             }
 
             kotlin.runCatching {
+                weatherApi.getGridpointProperties("MPX", 72, 98)
+            }.onSuccess {
+                gridpointsProperties.value = it
+            }.onFailure {
+                gridpointsProperties.value = null
+            }
+
+            kotlin.runCatching {
                 coordinatesApi.getCoordinates(56273)
             }.onSuccess {
                 coordinates.value = it
