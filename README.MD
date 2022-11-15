@@ -6,3 +6,6 @@ Dream Team 2: Electric Boogaloo
 - To build on this repository, the user must install and launch in Android Studio Dophin.  
 - To run on an android device or emulator, the instance must be running a minimum SDK of version 22.
 
+
+## Contribution Process
+- Fork the repository and create branches if neccessary
