@@ -79,8 +79,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun city(viewModel: MainViewModel){
     val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
+    val coordinates by viewModel.coordinates.collectAsState()
     Text(
-        text = gridPointEndpoints?.properties?.relativeLocation?.properties?.city.toString() + ", " + gridPointEndpoints?.properties?.relativeLocation?.properties?.state.toString(),
+        //text = gridPointEndpoints?.properties?.relativeLocation?.properties?.city.toString() + ", " + gridPointEndpoints?.properties?.relativeLocation?.properties?.state.toString(),
+        text = coordinates?.features?.get(0)?.geometry?.coords.toString(),
         textAlign = TextAlign.Center,
         fontSize = 30.sp
     )
