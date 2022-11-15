@@ -16,6 +16,10 @@ class MainViewModel: ViewModel() {
     val forecastHourly =  MutableStateFlow<Forecast?>(null)
     val gridpointsProperties = MutableStateFlow<Gridpoints?>(null)
 
+    private val coordinatesApi = CoordinatesAPI()
+    val coordinates = MutableStateFlow<CoordinatesData?>(null)
+
+
     init{
         viewModelScope.launch {
             kotlin.runCatching {
@@ -44,11 +48,11 @@ class MainViewModel: ViewModel() {
             }
 
             kotlin.runCatching {
-                weatherApi.getGridpointProperties("MPX", 72, 98)
+                coordinatesApi.getCoordinates(56273)
             }.onSuccess {
-                gridpointsProperties.value = it
+                coordinates.value = it
             }.onFailure {
-                gridpointsProperties.value = null
+                coordinates.value = null
             }
 
             kotlin.runCatching {
