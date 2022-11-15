@@ -46,12 +46,11 @@ class MainActivity : ComponentActivity() {
 
 
                 ) {
-
+                    val locFromCoords by viewModel.coordinates.collectAsState()
                     Column(modifier = Modifier
                         .fillMaxSize()
                         //.background(Color.Red)  //COME BACK HERE
                         .verticalScroll(rememberScrollState()),
-
                         horizontalAlignment = Alignment.CenterHorizontally
 
                     ) {
@@ -65,6 +64,8 @@ class MainActivity : ComponentActivity() {
                         dailyForecast(viewModel)
                         Spacer(modifier = Modifier.height(15.dp))
                         bottom(viewModel)
+                        Spacer(modifier = Modifier.height(15.dp))
+                        Text(text = locFromCoords?.city.toString())
                     }
                 }
             }
@@ -151,7 +152,7 @@ fun bottom(viewModel: MainViewModel){
         .padding(25.dp)){
         Column(
             modifier = Modifier
-                .background(Color.Yellow, shape= RoundedCornerShape(25.dp))
+                .background(Color.Yellow, shape = RoundedCornerShape(25.dp))
                 .fillMaxWidth()
         ) {
             Row(
@@ -219,7 +220,8 @@ fun today2(viewModel: MainViewModel){
                 .height(IntrinsicSize.Max)
     ){
         Column(
-            modifier = Modifier.width(130.dp)
+            modifier = Modifier
+                .width(130.dp)
                 //.align(alignment = Alignment.CenterVertically)
                 //.offset(0.dp, 12.dp)
                 .fillMaxHeight(),
