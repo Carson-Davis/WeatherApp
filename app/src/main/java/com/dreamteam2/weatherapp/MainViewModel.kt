@@ -56,7 +56,7 @@ class MainViewModel: ViewModel() {
             }
 
             kotlin.runCatching {
-                coordinatesApi.getCoordinates(56273)
+                coordinatesApi.getCoordinates("Willmar", "Minnesota")
             }.onSuccess {
                 coordinates.value = it
             }.onFailure {

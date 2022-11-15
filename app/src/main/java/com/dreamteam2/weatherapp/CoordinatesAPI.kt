@@ -17,7 +17,7 @@ class CoordinatesAPI {
         install(DefaultRequest) {
             url {
                 protocol = URLProtocol.HTTPS
-                host = "www.zipcodeapi.com"
+                host = "nominatim.openstreetmap"
             }
             header("X-Custom-Header", "WeatherApp")
         }
@@ -48,13 +48,17 @@ class CoordinatesAPI {
         }.body()
         return status
     }
-//https://www.zipcodeapi.com/rest/zHuJ0EFf96M1jzbhamP81EdDYy6N2AiCUKScrALYJIqWkcJerLA6t03ikcfqnbcZ/info.json/56273/radians
+
+    //https://nominatim.openstreetmap.org/search?q=willmar+Minnesota&format=geocodejson
     @Throws(Exception::class)
-    suspend fun getCoordinates(zipcode: Int): CoordinatesData {
+    suspend fun getCoordinates(city: String?, state: String?): CoordinatesData {
+
         val coord: CoordinatesData = httpClient.get {
             url {
-                appendPathSegments("rest", "zHuJ0EFf96M1jzbhamP81EdDYy6N2AiCUKScrALYJIqWkcJerLA6t03ikcfqnbcZ", "info.json",
-                "$zipcode", "radians")
+                host = "nominatim.openstreetmap.org/search/"
+                //&format=geocodejson
+                parameters.append("q", "Willmar")
+                parameters.append("format", "geocodejson")
             }
         }.body()
         return coord

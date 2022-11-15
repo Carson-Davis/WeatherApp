@@ -4,10 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CoordinatesData(
+data class CoordinatesAPIGeometry(
     @SerialName("type")
     val type: String? = "",
-    @SerialName("features")
-    val features: List<CoordinatesAPIFeatures>? = emptyList(),
+    @SerialName("coordinates")
+    val coords: List<Double>? = emptyList(),
 
     )

@@ -8,4 +8,9 @@ Dream Team 2: Electric Boogaloo
 
 
 ## Contribution Process
-- Fork the repository and create branches if neccessary
+- Fork the repository.
+- Create a branch for changes.
+- Once necessary changes are made on the branch, creat a pull request. Then, one of the core team members will review and merge the request. 
+- When the pull request has been merged, sync your fork to remain up to date.
+
+
