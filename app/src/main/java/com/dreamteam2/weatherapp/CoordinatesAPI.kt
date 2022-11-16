@@ -17,7 +17,7 @@ class CoordinatesAPI {
         install(DefaultRequest) {
             url {
                 protocol = URLProtocol.HTTPS
-                host = "nominatim.openstreetmap"
+                host = "nominatim.openstreetmap.org"
             }
             header("X-Custom-Header", "WeatherApp")
         }
@@ -51,16 +51,19 @@ class CoordinatesAPI {
 
     //https://nominatim.openstreetmap.org/search?q=willmar+Minnesota&format=geocodejson
     @Throws(Exception::class)
-    suspend fun getCoordinates(city: String?, state: String?): CoordinatesData {
+    suspend fun getCoordinates(city: String?, state: String?): List<CoordinatesData> {
 
-        val coord: CoordinatesData = httpClient.get {
+        val coord: List<CoordinatesData> = httpClient.get {
             url {
-                host = "nominatim.openstreetmap.org/search/"
                 //&format=geocodejson
-                parameters.append("q", "Willmar")
-                parameters.append("format", "geocodejson")
+                appendPathSegments("")
+                parameters.append("q", "$city $state")
+                parameters.append("limit", "1")
+                parameters.append("format", "json")
             }
         }.body()
+
+
         return coord
     }
 

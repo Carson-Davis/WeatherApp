@@ -17,7 +17,7 @@ class MainViewModel: ViewModel() {
     val gridpointsProperties = MutableStateFlow<Gridpoints?>(null)
 
     private val coordinatesApi = CoordinatesAPI()
-    val coordinates = MutableStateFlow<CoordinatesData?>(null)
+    val coordinates = MutableStateFlow<List<CoordinatesData>?>(null)
 
 
     init{
