@@ -219,6 +219,16 @@ fun today(viewModel: MainViewModel){
     }
 }
 
+/*
+ * fun hourly
+ *
+ * This function displays the hourly data for the specified location.
+ * It displays the information in a 12 hour format with horizontal scroll and
+ * uses degrees Fahrenheit for units.
+ * The information is organized in a Jetpack Compose Row
+ *
+ * @param MainViewModel
+ */
 @Composable
 fun hourly(viewModel: MainViewModel){
     val forecastHourly by viewModel.forecastHourly.collectAsState()
@@ -277,6 +287,16 @@ fun hourly(viewModel: MainViewModel){
     }
 }
 
+/*
+ * fun dailyForecast
+ *
+ * This function displays the daily data for the specified location.
+ * It displays the information for the morning and evening of each day for 7 days.
+ * It displays the information in a Jetpack Compose Column
+ * All units are in degrees Fahrenheit
+ *
+ * @param MainViewModel
+ */
 @Composable
 fun dailyForecast(viewModel: MainViewModel) {
     val foreCastPointEndpointTemperature by viewModel.forecast.collectAsState()
