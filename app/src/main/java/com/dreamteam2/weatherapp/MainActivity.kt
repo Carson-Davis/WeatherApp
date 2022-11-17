@@ -34,10 +34,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             WeatherAppTheme {
+//                Scaffolding helps keep the top bar always at the top of the screen
                 Scaffold(
                     topBar = {
                         Row(
                             modifier = Modifier
+//                                    MaterialTheme.colors.primaryVariant allows us to use
+//                                    different color themes for light and dark mode
                                 .background(MaterialTheme.colors.primaryVariant)
                                 .fillMaxWidth()
                                 .padding(horizontal = 20.dp, vertical = 20.dp)
