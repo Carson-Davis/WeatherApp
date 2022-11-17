@@ -72,7 +72,7 @@ class WeatherApi {
      * @returns GridPointEndpoints
      */
     @Throws(Exception::class)
-    suspend fun getGirdEndpoints(long: Double, lat: Double): getGirdEndpoints {
+    suspend fun getGirdEndpoints(long: Double, lat: Double): GridPointEndpoints {
         val girdPontEndpoints: GridPointEndpoints = httpClient.get {
             url {
                 appendPathSegments("points", "$long,$lat")
