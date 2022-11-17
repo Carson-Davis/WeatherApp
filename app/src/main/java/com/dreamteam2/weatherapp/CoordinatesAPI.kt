@@ -11,7 +11,13 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import io.ktor.client.engine.cio.*
-
+/*
+// CoordiantesAPI
+//
+//Setting up HttpClient dependencies along with establishing network connection
+//
+//
+*/
 class CoordinatesAPI {
     private val httpClient = HttpClient(CIO) {
         install(DefaultRequest) {
@@ -39,6 +45,10 @@ class CoordinatesAPI {
         }
     }
 
+    /*
+    getStatus
+    @returns stats - Returns a Status Object of the current state of the API
+     */
     @Throws(Exception::class)
     suspend fun getStatus(): Status {
         val status: Status = httpClient.get {
@@ -49,6 +59,14 @@ class CoordinatesAPI {
         return status
     }
 
+    /*getCoordinates
+    //Call to Nominatim API which takes a city and a state as paramters in order to query the API
+    //
+    @Param city - String of the city to be in the API query
+    @Param state - String of the state to be in the API query
+    @Returns coord - A list of the CoordiantesData data class that is populated form the HttpClient call.
+    //
+    */
     //https://nominatim.openstreetmap.org/search?q=willmar+Minnesota&format=geocodejson
     @Throws(Exception::class)
     suspend fun getCoordinates(city: String?, state: String?): List<CoordinatesData> {
