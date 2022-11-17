@@ -12,7 +12,15 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import io.ktor.client.engine.cio.*
 
+/*
+ * WeatherApi Class
+ * Responsible for handling all interactions with the weather.gov api, instantiated as val in MainViewModel to allow for calls to WeatherAPI functions
+ */
 class WeatherApi {
+    /*
+     * httpClient val
+     * used by class functions for network calls using predefined configuration
+     */
     private val httpClient = HttpClient(CIO) {
         install(DefaultRequest) {
             url {
@@ -39,6 +47,12 @@ class WeatherApi {
         }
     }
 
+    /*
+     * getStatus fun
+     * used to test api status / connection
+     *
+     * @returns Status
+     */
     @Throws(Exception::class)
     suspend fun getStatus(): Status {
         val status: Status = httpClient.get {
@@ -49,6 +63,14 @@ class WeatherApi {
         return status
     }
 
+    /*
+     * getGirdEndpoints fun
+     * fetches GridPointEndpoints for requested lat long pair
+     *
+     * @param long Longitude double
+     * @param long Latitude double
+     * @returns GridPointEndpoints
+     */
     @Throws(Exception::class)
     suspend fun getGirdEndpoints(long: Double, lat: Double): GridPointEndpoints {
         val girdPontEndpoints: GridPointEndpoints = httpClient.get {
@@ -59,6 +81,15 @@ class WeatherApi {
         return girdPontEndpoints
     }
 
+    /*
+     * getForecast fun
+     * fetches for Forecast of daily periods for requested grid
+     *
+     * @param cwa String as provided by getGirdEndpoints object
+     * @param x Int of grid as provided by getGirdEndpoints object
+     * @param y Int of grid as provided by getGirdEndpoints object
+     * @returns Forecast
+     */
     @Throws(Exception::class)
     suspend fun getForecast(cwa: String, x: Int, y: Int): Forecast {
         val foreCast: Forecast = httpClient.get {
@@ -69,6 +100,15 @@ class WeatherApi {
         return foreCast
     }
 
+    /*
+     * getForecastHourly fun
+     * fetches for Forecast of hourly periods for requested grid
+     *
+     * @param cwa String as provided by getGirdEndpoints object
+     * @param x Int of grid as provided by getGirdEndpoints object
+     * @param y Int of grid as provided by getGirdEndpoints object
+     * @returns Forecast
+     */
     @Throws(Exception::class)
     suspend fun getForecastHourly(cwa: String, x: Int, y: Int): Forecast {
         val foreCast: Forecast = httpClient.get {
@@ -79,6 +119,15 @@ class WeatherApi {
         return foreCast
     }
 
+    /*
+     * getGridpointProperties fun
+     * fetches for Forecast of hourly periods for requested grid
+     *
+     * @param cwa String as provided by getGirdEndpoints object
+     * @param x Int of grid as provided by getGirdEndpoints object
+     * @param y Int of grid as provided by getGirdEndpoints object
+     * @returns Gridpoints
+     */
     @Throws(Exception::class)
     suspend fun getGridpointProperties(cwa: String, x: Int, y: Int): Gridpoints {
         val gridpointsProperties: Gridpoints = httpClient.get {
