@@ -316,7 +316,12 @@ fun dailyForecast(viewModel: MainViewModel) {
         }
     }
 }
-
+/*
+* fun bottom
+* @param MainViewModel
+* Grabs the Dewpoint, Cloud Coverage, and Humididity data points from gridpointProperties and
+* passes the to the function dataRow to display them at the bottom of the screen
+ */
 @Composable
 fun bottom(viewModel: MainViewModel){
     val gridpointProperties by viewModel.gridpointsProperties.collectAsState()
@@ -346,6 +351,11 @@ fun bottom(viewModel: MainViewModel){
     }
 }
 
+/*
+* fun dataRow
+* @param String, String
+* Styling elements to display the Dewpoint, Cloud Coverage, and Humidity
+ */
 @Composable
 fun dataRow(leftText: String, rightText: String,){
     Row(
