@@ -76,6 +76,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/*
+* fun City
+* @param MainViewModel
+* Displays location name and coordinates on UI.
+*
+ */
 @Composable
 fun city(viewModel: MainViewModel){
     val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
@@ -88,6 +94,14 @@ fun city(viewModel: MainViewModel){
     )
 }
 
+/*
+* fun today
+* This function displays data relevant for "today" which includes the current
+* temperature, a description of the weather, a feels like temperature, a wind speed and
+* direction, and a high-low temperature for the day. Along with styling elements.
+* @param MainViewModel
+*
+ */
 @Composable
 fun today(viewModel: MainViewModel){
     val forecastHourly by viewModel.forecastHourly.collectAsState()
