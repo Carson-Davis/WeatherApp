@@ -29,7 +29,7 @@ import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
     val viewModel: MainViewModel = MainViewModel()
-    val secondView: MainViewModel = MainViewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

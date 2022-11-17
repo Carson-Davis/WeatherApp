@@ -5,7 +5,15 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+    /*
+    MainViewModel
+    -------------------------------------------------------------
+    The class establishes the corresponding data classes needed for all the api calls.
+    It then launches our viewmodel by getting the grid endpoints from the api.
+    The viewmodel holds the fetched information along with updating when another call is made.
+    @Returns it - This is the current state of the fetched API data that is updated and maintained by this class
 
+     */
 class MainViewModel: ViewModel() {
 
     private val weatherApi = WeatherApi()
@@ -21,6 +29,7 @@ class MainViewModel: ViewModel() {
 
 
     init{
+        //Launches viewmodel with a call to the WeatherAPI that fetches the standard generic output of the API
         viewModelScope.launch {
             kotlin.runCatching {
                // weatherApi.getForecast(31, 80)
@@ -31,6 +40,7 @@ class MainViewModel: ViewModel() {
                 gridPointEndpoints.value = null
             }
 
+        //
             kotlin.runCatching {
                 weatherApi.getForecast("MPX", 72, 98) // TOP 31 80 vw MPX 72 98
             }.onSuccess {
@@ -39,6 +49,7 @@ class MainViewModel: ViewModel() {
                 forecast.value = null
             }
 
+        //Call to WeatherAPI which fetches the hourly forecast
             kotlin.runCatching {
                 weatherApi.getForecastHourly("MPX", 72, 98)
             }.onSuccess {
@@ -47,6 +58,7 @@ class MainViewModel: ViewModel() {
                 forecastHourly.value = null
             }
 
+        //Call to WeatherAPI that gets the properties of a gridpoint
             kotlin.runCatching {
                 weatherApi.getGridpointProperties("MPX", 72, 98)
             }.onSuccess {
@@ -55,6 +67,7 @@ class MainViewModel: ViewModel() {
                 gridpointsProperties.value = null
             }
 
+            //Call to CoordinatesAPI for the city and state
             kotlin.runCatching {
                 coordinatesApi.getCoordinates("Willmar", "Minnesota")
             }.onSuccess {
@@ -63,6 +76,7 @@ class MainViewModel: ViewModel() {
                 coordinates.value = null
             }
 
+            //Call to WeatherAPI for the current status of the API
             kotlin.runCatching {
                 weatherApi.getStatus()
             }.onSuccess {
