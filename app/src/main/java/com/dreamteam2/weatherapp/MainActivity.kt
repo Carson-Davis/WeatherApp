@@ -88,7 +88,7 @@ fun city(viewModel: MainViewModel){
     val coordinates by viewModel.coordinates.collectAsState()
     Text(
         //text = gridPointEndpoints?.properties?.relativeLocation?.properties?.city.toString() + ", " + gridPointEndpoints?.properties?.relativeLocation?.properties?.state.toString(),
-        text = coordinates?.features?.get(0)?.geometry?.coords.toString(),
+        text = coordinates?.get(0)?.lat.toString() + " " + coordinates?.get(0)?.lon.toString(),
         textAlign = TextAlign.Center,
         fontSize = 30.sp
     )
