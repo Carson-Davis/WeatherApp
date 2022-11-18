@@ -26,6 +26,13 @@ import androidx.compose.ui.unit.sp
 import com.dreamteam2.weatherapp.ui.theme.WeatherAppTheme
 import kotlin.math.roundToInt
 
+/*
+MainActivity
+-------------------------------------------------------------
+The class creates an instance of the MainViewModel class and takes all the data that MainViewModel
+pulls from the API and builds the UI of the application.
+
+ */
 
 class MainActivity : ComponentActivity() {
     val viewModel: MainViewModel = MainViewModel()
