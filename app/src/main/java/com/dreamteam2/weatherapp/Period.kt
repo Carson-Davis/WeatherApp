@@ -2,7 +2,13 @@ package com.dreamteam2.weatherapp
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+/*
+Period
+-------------------------------------------------------------
+The class helps deserialize the JSON data that is pulled in from the API and allows the MainViewModel
+to separate it out with no hassle
 
+ */
 @Serializable
 data class Period(
     @SerialName("number")
