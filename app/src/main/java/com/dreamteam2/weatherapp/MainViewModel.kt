@@ -1,30 +1,20 @@
 package com.dreamteam2.weatherapp
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
-    /*
-    MainViewModel
-    -------------------------------------------------------------
-    The class establishes the corresponding data classes needed for all the api calls.
-    It then launches our viewmodel by getting the grid endpoints from the api.
-    The viewmodel holds the fetched information along with updating when another call is made.
-    @Returns it - This is the current state of the fetched API data that is updated and maintained by this class
+/*
+MainViewModel
+-------------------------------------------------------------
+The class establishes the corresponding data classes needed for all the api calls.
+It then launches our viewmodel by getting the grid endpoints from the api.
+The viewmodel holds the fetched information along with updating when another call is made.
+@Returns it - This is the current state of the fetched API data that is updated and maintained by this class
 
-     */
+ */
 class MainViewModel: ViewModel() {
 
     private val weatherApi = WeatherApi()
-
-    private var searchCity: String = "St. Joseph"
-    private var searchState: String = "Minnesota"
-    private var lat: Double = 45.5648
-    private var long: Double = -94.3180
-    private var cwa: String = "MPX"
-    private var gridX: Int = 72
-    private var gridY: Int = 98
 
     val status = MutableStateFlow<Status?>(null)
     val gridPointEndpoints = MutableStateFlow<GridPointEndpoints?>(null)
@@ -48,9 +38,13 @@ class MainViewModel: ViewModel() {
 
     suspend fun getGridEndpoints(){
         kotlin.runCatching {
-            weatherApi.getGirdEndpoints(this.long, this.lat) // 39.0473 -95.6752 vs 45.5648 -94.3180
+            weatherApi.getGirdEndpoints(
+                this.coordinates.value?.get(0)!!.lon?.toDouble()!!,
+                this.coordinates.value?.get(0)!!.lat?.toDouble()!!
+            ) // 39.0473 -95.6752 vs 45.5648 -94.3180
         }.onSuccess {
             gridPointEndpoints.value = it
+
         }.onFailure {
             gridPointEndpoints.value = null
         }
@@ -58,7 +52,7 @@ class MainViewModel: ViewModel() {
 
     suspend fun getDailyForecast(){
         kotlin.runCatching {
-            weatherApi.getForecast(this.cwa, this.gridX, this.gridY) // TOP 31 80 vw MPX 72 98
+            weatherApi.getForecast(this.gridPointEndpoints.value?.properties?.cwa!!, this.gridPointEndpoints.value?.properties?.gridX!!, this.gridPointEndpoints.value?.properties?.gridY!!) // TOP 31 80 vw MPX 72 98
         }.onSuccess {
             forecast.value = it
         }.onFailure {
@@ -69,7 +63,7 @@ class MainViewModel: ViewModel() {
     suspend fun getHourlyForecast(){
         //Call to WeatherAPI which fetches the hourly forecast
         kotlin.runCatching {
-            weatherApi.getForecastHourly(this.cwa, this.gridX, this.gridY)
+            weatherApi.getForecastHourly(this.gridPointEndpoints.value?.properties?.cwa!!, this.gridPointEndpoints.value?.properties?.gridX!!, this.gridPointEndpoints.value?.properties?.gridY!!)
         }.onSuccess {
             forecastHourly.value = it
         }.onFailure {
@@ -80,7 +74,7 @@ class MainViewModel: ViewModel() {
     suspend fun getGridpointProperties(){
         //Call to WeatherAPI that gets the properties of a gridpoint
         kotlin.runCatching {
-            weatherApi.getGridpointProperties(this.cwa, this.gridX, this.gridY)
+            weatherApi.getGridpointProperties(this.gridPointEndpoints.value?.properties?.cwa!!, this.gridPointEndpoints.value?.properties?.gridX!!, this.gridPointEndpoints.value?.properties?.gridY!!)
         }.onSuccess {
             gridpointsProperties.value = it
         }.onFailure {
@@ -88,23 +82,20 @@ class MainViewModel: ViewModel() {
         }
     }
 
-    suspend fun getCoordinates(){
+    suspend fun fetchByString(searchString: String){
         //Call to CoordinatesAPI for the city and state
         kotlin.runCatching {
-            coordinatesApi.getCoordinates(this.searchCity, this.searchState)
+            coordinatesApi.getCoordinates(searchString)
         }.onSuccess {
             coordinates.value = it
         }.onFailure {
             coordinates.value = null
         }
-    }
-
-    suspend fun setSearchCity(newString: String){
-        this.searchCity = newString
-    }
-
-    suspend fun setSearchState(newString: String){
-        this.searchState = newString
+        getStatus()
+        getGridEndpoints()
+        getDailyForecast()
+        getHourlyForecast()
+        getGridpointProperties()
     }
 
 }
