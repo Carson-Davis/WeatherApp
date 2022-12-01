@@ -69,13 +69,13 @@ class CoordinatesAPI {
     */
     //https://nominatim.openstreetmap.org/search?q=willmar+Minnesota&format=geocodejson
     @Throws(Exception::class)
-    suspend fun getCoordinates(city: String?, state: String?): List<CoordinatesData> {
+    suspend fun getCoordinates(searchString: String?): List<CoordinatesData> {
 
         val coord: List<CoordinatesData> = httpClient.get {
             url {
                 //&format=geocodejson
                 appendPathSegments("")
-                parameters.append("q", "$city $state")
+                parameters.append("q", "$searchString")
                 parameters.append("limit", "1")
                 parameters.append("format", "json")
             }

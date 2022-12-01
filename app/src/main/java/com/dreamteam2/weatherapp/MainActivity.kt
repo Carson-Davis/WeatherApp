@@ -9,16 +9,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 
-import androidx.compose.material.TabRowDefaults.Divider
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
-import androidx.compose.ui.res.painterResource
 
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -41,6 +35,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 
+var lat : Double = 0.0
+var long : Double = 0.0
+
 /*
 MainActivity
 -------------------------------------------------------------
@@ -48,10 +45,6 @@ The class creates an instance of the MainViewModel class and takes all the data 
 pulls from the API and builds the UI of the application.
 
  */
-
-var lat : Double = 0.0
-var long : Double = 0.0
-
 class MainActivity : ComponentActivity() {
     val viewModel: MainViewModel = MainViewModel()
 
@@ -65,50 +58,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             WeatherAppTheme {
-//                Scaffolding helps keep the top bar always at the top of the screen
-                Scaffold(
-                    topBar = {
-                        Row(
-                            modifier = Modifier
-//                                    MaterialTheme.colors.primaryVariant allows us to use
-//                                    different color themes for light and dark mode
-                                .background(MaterialTheme.colors.primaryVariant)
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp, vertical = 20.dp)
-                                .height(IntrinsicSize.Min)
-
-                        ) {
-                            Column(
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.Start,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .wrapContentWidth(Alignment.Start)
-                            ){
-                                city(viewModel)
-                            }
-                        }
-                    }
-                ){
-                    Column(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(20.dp)
-                        .verticalScroll(rememberScrollState()),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        today(viewModel)
-                        Spacer(modifier = Modifier.height(15.dp))
-                        hourly(viewModel)
-                        Spacer(modifier = Modifier.height(15.dp))
-                        dailyForecast(viewModel)
-                        Spacer(modifier = Modifier.height(15.dp))
-                        bottom(viewModel)
-                    }
-                }
+                mainLayout(viewModel)
             }
         }
     }
-
     val PERMISSION_ID = 42
     lateinit var mFusedLocationClient: FusedLocationProviderClient
 
@@ -197,6 +150,53 @@ class MainActivity : ComponentActivity() {
                 getLastLocation()
             }
         }
+    }
+}
+
+@Composable
+fun mainLayout(viewModel: MainViewModel){
+    //Scaffolding helps keep the top bar always at the top of the screen
+    Scaffold(
+        topBar = {
+            Row(
+                modifier = Modifier
+//                                    MaterialTheme.colors.primaryVariant allows us to use
+//                                    different color themes for light and dark mode
+                    .background(MaterialTheme.colors.primaryVariant)
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 20.dp)
+                    .height(IntrinsicSize.Min)
+
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier
+                        .weight(1f)
+                        .wrapContentWidth(Alignment.Start)
+                ){
+                    city(viewModel)
+                }
+            }
+        }
+    ){
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
+            .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            today(viewModel)
+            Spacer(modifier = Modifier.height(15.dp))
+            hourly(viewModel)
+            Spacer(modifier = Modifier.height(15.dp))
+            dailyForecast(viewModel)
+            Spacer(modifier = Modifier.height(15.dp))
+            bottom(viewModel)
+        }
+    }
+    LaunchedEffect(true){
+        viewModel.fetchByString("Key West, Florida")
     }
 }
 
