@@ -27,7 +27,6 @@ class MainViewModel: ViewModel() {
     private val coordinatesApi = CoordinatesAPI()
     val coordinates = MutableStateFlow<List<CoordinatesData>?>(null)
 
-
     init{
         //Launches viewmodel with a call to the WeatherAPI that fetches the standard generic output of the API
         viewModelScope.launch {
