@@ -40,7 +40,7 @@ class WeatherApi {
         install(Logging){
             logger = object : Logger {
                 override fun log(message: String){
-                    Log.i("Network", message)
+//                    Log.i("Network", message)
                 }
             }
             level = LogLevel.INFO
@@ -75,7 +75,7 @@ class WeatherApi {
     suspend fun getGirdEndpoints(long: Double, lat: Double): GridPointEndpoints {
         val girdPontEndpoints: GridPointEndpoints = httpClient.get {
             url {
-                appendPathSegments("points", "$long,$lat")
+                appendPathSegments("points", "$lat,$long")
             }
         }.body()
         return girdPontEndpoints
