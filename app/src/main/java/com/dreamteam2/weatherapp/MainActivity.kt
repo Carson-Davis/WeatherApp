@@ -1,6 +1,5 @@
 package com.dreamteam2.weatherapp
 
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -47,8 +46,6 @@ import com.google.android.gms.location.*
 import kotlinx.coroutines.Delay
 import kotlinx.coroutines.launch
 
-var lat : Double = 0.0
-var long : Double = 0.0
 /*
 MainActivity
 -------------------------------------------------------------
@@ -83,8 +80,8 @@ class MainActivity : ComponentActivity() {
                     if (location == null) {
                         requestNewLocationData()
                     } else {
-                        lat = location.latitude
-                        long = location.longitude
+                        viewModel.lat.value = location.latitude
+                        viewModel.long.value = location.longitude
                     }
                 }
             } else {
@@ -117,8 +114,8 @@ class MainActivity : ComponentActivity() {
     private val mLocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             var mLastLocation: Location = locationResult.lastLocation
-            lat = mLastLocation.latitude
-            long = mLastLocation.longitude
+            viewModel.lat.value = mLastLocation.latitude
+            viewModel.long.value = mLastLocation.longitude
         }
     }
 
@@ -235,7 +232,7 @@ fun locs(viewModel: MainViewModel){
     var list: ArrayList<com.dreamteam2.weatherapp.Location>? = ArrayList<com.dreamteam2.weatherapp.Location>()
     list?.add(firsPer)
      */
-    
+
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(20.dp)
@@ -276,7 +273,7 @@ fun city(viewModel: MainViewModel){
     Text(
         //text = gridPointEndpoints?.properties?.relativeLocation?.properties?.city.toString() + ", " + gridPointEndpoints?.properties?.relativeLocation?.properties?.state.toString(),
         //text = coordinates?.get(0)?.lat.toString() + " " + coordinates?.get(0)?.lon.toString(),
-        text = lat.toString() + " " + long.toString(),
+        text = viewModel.lat.value.toString() + " " + viewModel.long.value.toString(),
         textAlign = TextAlign.Center,
         fontSize = 30.sp
     )

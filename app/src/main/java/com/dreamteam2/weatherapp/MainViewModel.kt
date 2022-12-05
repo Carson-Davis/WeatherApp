@@ -21,7 +21,8 @@ class MainViewModel: ViewModel() {
     val forecast = MutableStateFlow<Forecast?>(null)
     val forecastHourly =  MutableStateFlow<Forecast?>(null)
     val gridpointsProperties = MutableStateFlow<Gridpoints?>(null)
-
+    var lat = MutableStateFlow<Double?>(0.0)
+    var long = MutableStateFlow<Double?>(0.0)
     private val coordinatesApi = CoordinatesAPI()
     val coordinates = MutableStateFlow<List<CoordinatesData>?>(null)
 
