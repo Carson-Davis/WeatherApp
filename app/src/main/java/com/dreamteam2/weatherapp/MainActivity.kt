@@ -32,8 +32,19 @@ import android.provider.Settings
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 var lat : Double = 0.0
 var long : Double = 0.0
@@ -144,6 +155,7 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    @SuppressLint("MissingSuperCall")
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == PERMISSION_ID) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
@@ -153,6 +165,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun mainLayout(viewModel: MainViewModel){
     //Scaffolding helps keep the top bar always at the top of the screen
@@ -175,6 +188,7 @@ fun mainLayout(viewModel: MainViewModel){
                         .weight(1f)
                         .wrapContentWidth(Alignment.Start)
                 ){
+                    searchbar(viewModel)
                     city(viewModel)
                 }
             }
@@ -218,6 +232,82 @@ fun city(viewModel: MainViewModel){
         fontSize = 30.sp
     )
 }
+@Composable
+fun searchbar(viewModel: MainViewModel){
+    val searchTextState = remember { mutableStateOf(TextFieldValue("")) }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+    ) {
+        TextField(
+            value = searchTextState.value,
+            onValueChange = { value ->
+                searchTextState.value = value
+                runBlocking {
+                    viewModel.fetchByString(searchString = searchTextState.value.toString())
+                }
+            },
+            placeholder = {
+                Text(
+                    text = "Enter city name",
+                    color = MaterialTheme.colors.onPrimary
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
+            textStyle = TextStyle(color = Color.White, fontSize = 18.sp),
+            leadingIcon = {
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .padding(end = 20.dp)
+                        .size(24.dp)
+                )
+            },
+            trailingIcon = {
+                if (searchTextState.value != TextFieldValue("")) {
+                    IconButton(
+                        onClick = {
+                            searchTextState.value =
+                                TextFieldValue("") // Remove text from TextField when you press the 'X' icon
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(15.dp)
+                                .size(24.dp)
+                        )
+                    }
+                }
+            },
+            singleLine = true,
+            shape = RectangleShape, // The TextFiled has rounded corners top left and right by default
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.White,
+                cursorColor = Color.White,
+                leadingIconColor = Color.White,
+                trailingIconColor = Color.White,
+                backgroundColor = MaterialTheme.colors.primary,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    viewModel.viewModelScope.launch {
+                        viewModel.fetchByString(searchString = searchTextState.value.text)
+                    }
+                    // focusManager.clearFocus()
+                },
+            )
+        )
+    }
+}
+
 
 /*
 * fun today
