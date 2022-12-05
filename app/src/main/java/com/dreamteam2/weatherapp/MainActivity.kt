@@ -1,6 +1,5 @@
 package com.dreamteam2.weatherapp
 
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -95,8 +94,8 @@ class MainActivity : ComponentActivity() {
                     if (location == null) {
                         requestNewLocationData()
                     } else {
-                        lat = location.latitude
-                        long = location.longitude
+                        viewModel.lat.value = location.latitude
+                        viewModel.long.value = location.longitude
                     }
                 }
             } else {
@@ -129,8 +128,8 @@ class MainActivity : ComponentActivity() {
     private val mLocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             var mLastLocation: Location = locationResult.lastLocation
-            lat = mLastLocation.latitude
-            long = mLastLocation.longitude
+            viewModel.lat.value = mLastLocation.latitude
+            viewModel.long.value = mLastLocation.longitude
         }
     }
 
@@ -248,7 +247,7 @@ fun locs(viewModel: MainViewModel){
     var list: ArrayList<com.dreamteam2.weatherapp.Location>? = ArrayList<com.dreamteam2.weatherapp.Location>()
     list?.add(firsPer)
      */
-    
+
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(20.dp)
@@ -286,6 +285,9 @@ fun locButton(viewModel: MainViewModel){
 fun city(viewModel: MainViewModel){
     val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
     val coordinates by viewModel.coordinates.collectAsState()
+    val lat by viewModel.lat.collectAsState()
+    val long by viewModel.long.collectAsState()
+
     Text(
         //text = gridPointEndpoints?.properties?.relativeLocation?.properties?.city.toString() + ", " + gridPointEndpoints?.properties?.relativeLocation?.properties?.state.toString(),
         //text = coordinates?.get(0)?.lat.toString() + " " + coordinates?.get(0)?.lon.toString(),
