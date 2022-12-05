@@ -26,11 +26,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.os.Build
 import android.os.Looper
 import android.provider.Settings
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.annotation.RequiresApi
 
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
@@ -42,10 +42,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.core.app.ActivityCompat
-import androidx.core.app.Person
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -53,9 +52,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.location.*
-import kotlinx.coroutines.Delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 var lat : Double = 0.0
 var long : Double = 0.0
@@ -70,6 +70,7 @@ pulls from the API and builds the UI of the application.
 class MainActivity : ComponentActivity() {
     val viewModel: MainViewModel = MainViewModel()
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -173,6 +174,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.N)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @Composable
 fun mainLayout(viewModel: MainViewModel){
@@ -210,7 +212,7 @@ fun mainLayout(viewModel: MainViewModel){
         },
 
     ){
-        navigation(navController = navController, viewModel)
+        navigation(navController, viewModel, LocalContext.current)
 
     }
     LaunchedEffect(true){
@@ -234,43 +236,63 @@ fun homeScreen(viewModel: MainViewModel){
         dailyForecast(viewModel)
         Spacer(modifier = Modifier.height(15.dp))
         bottom(viewModel)
+        Spacer(modifier = Modifier.height(15.dp))
+        //readFromInternalStorage(context = LocalContext.current)
+        //Spacer(modifier = Modifier.height(15.dp))
+        saveLocation(viewModel)
         Spacer(modifier = Modifier.height(50.dp))
+
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun locs(viewModel: MainViewModel){
+fun locs(viewModel: MainViewModel, context: Context, navController: NavController){
     val coordinates by viewModel.coordinates.collectAsState()
     /*
     var firsPer = com.dreamteam2.weatherapp.Location("name")
     var list: ArrayList<com.dreamteam2.weatherapp.Location>? = ArrayList<com.dreamteam2.weatherapp.Location>()
     list?.add(firsPer)
      */
+    var locations: String = readFromInternalStorage(context)
+    var locArray: ArrayList<String> = ArrayList()
+    if (locations != ""){
+        locArray = locations.split("\n") as ArrayList<String>
+        locArray.removeIf{ it == "" }
+    }
+
+
 
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(20.dp)
         .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally) {
-                locButton(viewModel)
-                locButton(viewModel)
+                for (str:String in locArray){
+                    locButton(viewModel, str, navController)
+                }
             }
 
 }
 
 @Composable
-fun locButton(viewModel: MainViewModel){
+fun locButton(viewModel: MainViewModel, name: String, navController: NavController){
     val coordinates by viewModel.coordinates.collectAsState()
     Button(modifier = Modifier
         .fillMaxSize()
         .height(IntrinsicSize.Max)
         .padding(15.dp),
-        onClick = { /*TODO*/ },
+        onClick = {
+                  runBlocking {
+                      viewModel.fetchByString(name)
+                  }
+            navController.navigate("home")
+        },
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.colors.primaryVariant,
             contentColor = Color.Black)
     ) {
-        Text(textAlign = TextAlign.Center, text = coordinates?.get(0)?.displayName.toString(), fontSize = 30.sp)
+        Text(textAlign = TextAlign.Center, text = name, fontSize = 30.sp)
     }
 }
 
@@ -629,6 +651,61 @@ fun bottom(viewModel: MainViewModel){
     }
 }
 
+@Composable
+fun saveLocation(viewModel: MainViewModel){
+    val coordinates by viewModel.coordinates.collectAsState()
+    val context = LocalContext.current
+    Column( modifier = Modifier
+        .fillMaxWidth()
+        .alpha(1.0F)
+    ) {
+        Button(modifier = Modifier
+            .fillMaxSize()
+            .height(IntrinsicSize.Max)
+            .padding(15.dp),
+            onClick = {
+
+                var saveStr:String = readFromInternalStorage(context)
+                saveStr = saveStr + "\n" + coordinates?.get(0)?.displayName.toString()
+
+                saveToInternalStorage(context, saveStr)
+            },
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.primaryVariant,
+                contentColor = Color.Black)
+        ) {
+            Text(textAlign = TextAlign.Center, text = "Save Location", fontSize = 30.sp)
+        }
+    }
+}
+
+
+fun saveToInternalStorage(context: Context, msg: String) {
+
+        val fos: FileOutputStream =
+            context.openFileOutput("savedLocs.txt", Context.MODE_PRIVATE)
+        fos.write(msg.toByteArray())
+        fos.flush()
+        fos.close()
+     }
+
+fun readFromInternalStorage(context: Context): String {
+
+    val fin: FileInputStream = context.openFileInput("savedLocs.txt")
+    var a: Int
+    val temp = StringBuilder()
+    //while (fin.read().also { a = it } != -1) {
+    //    temp.append(a.toChar())
+    //}
+    var i = 0
+    while (i < fin.available().toInt()){
+        temp.append(fin.read().toChar())
+    }
+    fin.close()
+
+    return temp.toString()
+}
+
 /*
 * fun dataRow
 * @param String, String
@@ -721,15 +798,16 @@ fun bottomNavBar(navController: NavController) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun navigation(navController: NavHostController, viewModel: MainViewModel) {
+fun navigation(navController: NavHostController, viewModel: MainViewModel, context: Context) {
     //val viewModel: MainViewModel = MainViewModel()
     NavHost(navController, startDestination = NavigationItem.Home.route) {
         composable(NavigationItem.Home.route) {
             homeScreen(viewModel)
         }
         composable(NavigationItem.Locations.route) {
-            locs(viewModel)
+            locs(viewModel, context, navController)
         }
     }
 }
