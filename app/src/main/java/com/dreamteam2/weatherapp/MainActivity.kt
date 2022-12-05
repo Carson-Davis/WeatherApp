@@ -47,7 +47,7 @@ import com.google.android.gms.location.*
 import kotlinx.coroutines.Delay
 import kotlinx.coroutines.launch
 
-var lat : Double = 69.0
+var lat : Double = 0.0
 var long : Double = 0.0
 /*
 MainActivity
@@ -62,9 +62,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        checkPermissions()
-        requestNewLocationData()
-        getLastLocation()
         setContent {
             WeatherAppTheme {
                 mainLayout(viewModel)
@@ -140,7 +137,7 @@ class MainActivity : ComponentActivity() {
     itself can use the devices GPS
      */
     fun isLocationEnabled(): Boolean {
-        var locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        var locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
             LocationManager.NETWORK_PROVIDER
         )
