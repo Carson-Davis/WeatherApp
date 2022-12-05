@@ -32,17 +32,29 @@ import android.provider.Settings
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewModelScope
+
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.core.app.ActivityCompat
+import androidx.core.app.Person
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.location.*
+import kotlinx.coroutines.Delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -59,14 +71,11 @@ pulls from the API and builds the UI of the application.
 class MainActivity : ComponentActivity() {
     val viewModel: MainViewModel = MainViewModel()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
         requestNewLocationData()
         getLastLocation()
-
         setContent {
             WeatherAppTheme {
                 mainLayout(viewModel)
@@ -165,10 +174,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @Composable
 fun mainLayout(viewModel: MainViewModel){
+    val navController = rememberNavController()
+    //var change: Int = 0
     //Scaffolding helps keep the top bar always at the top of the screen
+
+
     Scaffold(
         topBar = {
             Row(
@@ -192,25 +205,74 @@ fun mainLayout(viewModel: MainViewModel){
                     city(viewModel)
                 }
             }
-        }
+        },
+        bottomBar = {
+            bottomNavBar(navController)
+
+        },
+
     ){
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
-            .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            today(viewModel)
-            Spacer(modifier = Modifier.height(15.dp))
-            hourly(viewModel)
-            Spacer(modifier = Modifier.height(15.dp))
-            dailyForecast(viewModel)
-            Spacer(modifier = Modifier.height(15.dp))
-            bottom(viewModel)
-        }
+        navigation(navController = navController, viewModel)
+
     }
     LaunchedEffect(true){
         viewModel.fetchByString("Key West, Florida")
+    }
+}
+
+
+@Composable
+fun homeScreen(viewModel: MainViewModel){
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(20.dp)
+        .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        today(viewModel)
+        Spacer(modifier = Modifier.height(15.dp))
+        hourly(viewModel)
+        Spacer(modifier = Modifier.height(15.dp))
+        dailyForecast(viewModel)
+        Spacer(modifier = Modifier.height(15.dp))
+        bottom(viewModel)
+        Spacer(modifier = Modifier.height(50.dp))
+    }
+}
+
+@Composable
+fun locs(viewModel: MainViewModel){
+    val coordinates by viewModel.coordinates.collectAsState()
+    /*
+    var firsPer = com.dreamteam2.weatherapp.Location("name")
+    var list: ArrayList<com.dreamteam2.weatherapp.Location>? = ArrayList<com.dreamteam2.weatherapp.Location>()
+    list?.add(firsPer)
+     */
+    
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(20.dp)
+        .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+                locButton(viewModel)
+                locButton(viewModel)
+            }
+
+}
+
+@Composable
+fun locButton(viewModel: MainViewModel){
+    val coordinates by viewModel.coordinates.collectAsState()
+    Button(modifier = Modifier
+        .fillMaxSize()
+        .height(IntrinsicSize.Max)
+        .padding(15.dp),
+        onClick = { /*TODO*/ },
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = MaterialTheme.colors.primaryVariant,
+            contentColor = Color.Black)
+    ) {
+        Text(textAlign = TextAlign.Center, text = coordinates?.get(0)?.displayName.toString(), fontSize = 30.sp)
     }
 }
 
@@ -232,6 +294,7 @@ fun city(viewModel: MainViewModel){
         fontSize = 30.sp
     )
 }
+
 @Composable
 fun searchbar(viewModel: MainViewModel){
     val searchTextState = remember { mutableStateOf(TextFieldValue("")) }
@@ -321,10 +384,10 @@ fun searchbar(viewModel: MainViewModel){
 fun today(viewModel: MainViewModel){
     val forecastHourly by viewModel.forecastHourly.collectAsState()
     val gridpointProperties by viewModel.gridpointsProperties.collectAsState()
-    val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
     Column(
         modifier = Modifier
             .background(MaterialTheme.colors.primaryVariant, shape = RoundedCornerShape(25.dp))
+            .fillMaxSize()
     ){
         Row(
             modifier = Modifier
@@ -604,6 +667,69 @@ fun dataRow(leftText: String, rightText: String,){
                 textAlign = TextAlign.Center,
                 fontSize = 20.sp
             )
+        }
+    }
+}
+
+@Composable
+fun bottomNavBar(navController: NavController) {
+    val items = listOf(
+        NavigationItem.Home,
+        NavigationItem.Locations,
+    )
+    BottomNavigation(
+        backgroundColor = MaterialTheme.colors.primaryVariant,
+        contentColor = Color.White,
+
+        ){
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+        items.forEach { item ->
+            BottomNavigationItem(
+                icon = {
+                    Icon(
+                        painterResource(id = item.icon),
+                        contentDescription = item.title,
+                        Modifier.size(30.dp)
+                    )
+                },
+                label = { Text(text = item.title) },
+                selectedContentColor = Color.White,
+                unselectedContentColor = Color.Black.copy(0.4f),
+                alwaysShowLabel = true,
+                selected = currentRoute == item.route,
+                onClick = {
+                    navController.navigate(item.route) {
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route) {
+                                saveState = true
+                            }
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
+                }
+                //modifier = Modifier.size(5.dp, 5.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun navigation(navController: NavHostController, viewModel: MainViewModel) {
+    //val viewModel: MainViewModel = MainViewModel()
+    NavHost(navController, startDestination = NavigationItem.Home.route) {
+        composable(NavigationItem.Home.route) {
+            homeScreen(viewModel)
+        }
+        composable(NavigationItem.Locations.route) {
+            locs(viewModel)
         }
     }
 }
