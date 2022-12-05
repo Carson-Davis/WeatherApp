@@ -40,7 +40,7 @@ class WeatherApi {
         install(Logging){
             logger = object : Logger {
                 override fun log(message: String){
-                    Log.i("Network", message)
+//                    Log.i("Network", message)
                 }
             }
             level = LogLevel.INFO

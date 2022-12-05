@@ -607,3 +607,4 @@ fun dataRow(leftText: String, rightText: String,){
         }
     }
 }
+
