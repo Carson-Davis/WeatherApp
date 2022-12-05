@@ -32,6 +32,16 @@ import android.provider.Settings
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.viewModelScope
+
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.core.app.ActivityCompat
@@ -46,9 +56,11 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.location.*
 import kotlinx.coroutines.Delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 var lat : Double = 0.0
 var long : Double = 0.0
+
 /*
 MainActivity
 -------------------------------------------------------------
@@ -162,13 +174,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @Composable
 fun mainLayout(viewModel: MainViewModel){
     val navController = rememberNavController()
     //var change: Int = 0
     //Scaffolding helps keep the top bar always at the top of the screen
+
 
     Scaffold(
         topBar = {
@@ -189,6 +201,7 @@ fun mainLayout(viewModel: MainViewModel){
                         .weight(1f)
                         .wrapContentWidth(Alignment.Start)
                 ){
+                    searchbar(viewModel)
                     city(viewModel)
                 }
             }
@@ -200,12 +213,12 @@ fun mainLayout(viewModel: MainViewModel){
 
     ){
         navigation(navController = navController, viewModel)
+
     }
     LaunchedEffect(true){
         viewModel.fetchByString("Key West, Florida")
     }
 }
-
 
 
 @Composable
@@ -281,6 +294,83 @@ fun city(viewModel: MainViewModel){
         fontSize = 30.sp
     )
 }
+
+@Composable
+fun searchbar(viewModel: MainViewModel){
+    val searchTextState = remember { mutableStateOf(TextFieldValue("")) }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+    ) {
+        TextField(
+            value = searchTextState.value,
+            onValueChange = { value ->
+                searchTextState.value = value
+                runBlocking {
+                    viewModel.fetchByString(searchString = searchTextState.value.toString())
+                }
+            },
+            placeholder = {
+                Text(
+                    text = "Enter city name",
+                    color = MaterialTheme.colors.onPrimary
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
+            textStyle = TextStyle(color = Color.White, fontSize = 18.sp),
+            leadingIcon = {
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .padding(end = 20.dp)
+                        .size(24.dp)
+                )
+            },
+            trailingIcon = {
+                if (searchTextState.value != TextFieldValue("")) {
+                    IconButton(
+                        onClick = {
+                            searchTextState.value =
+                                TextFieldValue("") // Remove text from TextField when you press the 'X' icon
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(15.dp)
+                                .size(24.dp)
+                        )
+                    }
+                }
+            },
+            singleLine = true,
+            shape = RectangleShape, // The TextFiled has rounded corners top left and right by default
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.White,
+                cursorColor = Color.White,
+                leadingIconColor = Color.White,
+                trailingIconColor = Color.White,
+                backgroundColor = MaterialTheme.colors.primary,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    viewModel.viewModelScope.launch {
+                        viewModel.fetchByString(searchString = searchTextState.value.text)
+                    }
+                    // focusManager.clearFocus()
+                },
+            )
+        )
+    }
+}
+
 
 /*
 * fun today
@@ -643,3 +733,4 @@ fun navigation(navController: NavHostController, viewModel: MainViewModel) {
         }
     }
 }
+
