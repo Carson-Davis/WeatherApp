@@ -285,10 +285,13 @@ fun locButton(viewModel: MainViewModel){
 fun city(viewModel: MainViewModel){
     val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
     val coordinates by viewModel.coordinates.collectAsState()
+    val lat by viewModel.lat.collectAsState()
+    val long by viewModel.long.collectAsState()
+
     Text(
         //text = gridPointEndpoints?.properties?.relativeLocation?.properties?.city.toString() + ", " + gridPointEndpoints?.properties?.relativeLocation?.properties?.state.toString(),
         //text = coordinates?.get(0)?.lat.toString() + " " + coordinates?.get(0)?.lon.toString(),
-        text = viewModel.lat.value.toString() + " " + viewModel.long.value.toString(),
+        text = lat.toString() + " " + long.toString(),
         textAlign = TextAlign.Center,
         fontSize = 30.sp
     )
