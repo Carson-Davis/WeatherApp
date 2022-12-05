@@ -1,5 +1,6 @@
 package com.dreamteam2.weatherapp
 
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,6 +20,35 @@ import androidx.compose.ui.unit.sp
 import com.dreamteam2.weatherapp.ui.theme.WeatherAppTheme
 import kotlin.math.roundToInt
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.os.Looper
+import android.provider.Settings
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.core.app.ActivityCompat
+import androidx.core.app.Person
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.location.*
+import kotlinx.coroutines.Delay
+import kotlinx.coroutines.launch
+
+var lat : Double = 0.0
+var long : Double = 0.0
 /*
 MainActivity
 -------------------------------------------------------------
@@ -31,17 +61,115 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        requestNewLocationData()
+        getLastLocation()
         setContent {
             WeatherAppTheme {
                 mainLayout(viewModel)
             }
         }
     }
+    val PERMISSION_ID = 42
+    lateinit var mFusedLocationClient: FusedLocationProviderClient
+
+    @SuppressLint("MissingPermission")
+    fun getLastLocation() {
+        if (checkPermissions()) {
+            if (isLocationEnabled()) {
+
+                mFusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
+                    var location: Location? = task.result
+                    if (location == null) {
+                        requestNewLocationData()
+                    } else {
+                        lat = location.latitude
+                        long = location.longitude
+                    }
+                }
+            } else {
+                Toast.makeText(this, "Turn on location", Toast.LENGTH_LONG).show()
+                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(intent)
+            }
+        } else {
+            requestPermissions()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    fun requestNewLocationData() {
+        var mLocationRequest = LocationRequest()
+        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        mLocationRequest.interval = 0
+        mLocationRequest.fastestInterval = 0
+        mLocationRequest.numUpdates = 1
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        Looper.myLooper()?.let {
+            mFusedLocationClient!!.requestLocationUpdates(
+                mLocationRequest, mLocationCallback,
+                it
+            )
+        }
+    }
+
+    private val mLocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            var mLastLocation: Location = locationResult.lastLocation
+            lat = mLastLocation.latitude
+            long = mLastLocation.longitude
+        }
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        var locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER
+        )
+    }
+
+    private fun checkPermissions(): Boolean {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            return true
+        }
+        return false
+    }
+
+    private fun requestPermissions() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
+            PERMISSION_ID
+        )
+    }
+
+    @SuppressLint("MissingSuperCall")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        if (requestCode == PERMISSION_ID) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                getLastLocation()
+            }
+        }
+    }
 }
 
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @Composable
 fun mainLayout(viewModel: MainViewModel){
+    val navController = rememberNavController()
+    //var change: Int = 0
     //Scaffolding helps keep the top bar always at the top of the screen
+
     Scaffold(
         topBar = {
             Row(
@@ -64,25 +192,74 @@ fun mainLayout(viewModel: MainViewModel){
                     city(viewModel)
                 }
             }
-        }
+        },
+        bottomBar = {
+            bottomNavBar(navController)
+
+        },
+
     ){
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
-            .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            today(viewModel)
-            Spacer(modifier = Modifier.height(15.dp))
-            hourly(viewModel)
-            Spacer(modifier = Modifier.height(15.dp))
-            dailyForecast(viewModel)
-            Spacer(modifier = Modifier.height(15.dp))
-            bottom(viewModel)
-        }
+        navigation(navController = navController, viewModel)
     }
     LaunchedEffect(true){
-        viewModel.fetchByString("Ney York City, New York")
+        viewModel.fetchByString("Key West, Florida")
+    }
+}
+
+
+
+@Composable
+fun homeScreen(viewModel: MainViewModel){
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(20.dp)
+        .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        today(viewModel)
+        Spacer(modifier = Modifier.height(15.dp))
+        hourly(viewModel)
+        Spacer(modifier = Modifier.height(15.dp))
+        dailyForecast(viewModel)
+        Spacer(modifier = Modifier.height(15.dp))
+        bottom(viewModel)
+        Spacer(modifier = Modifier.height(50.dp))
+    }
+}
+
+@Composable
+fun locs(viewModel: MainViewModel){
+    val coordinates by viewModel.coordinates.collectAsState()
+    /*
+    var firsPer = com.dreamteam2.weatherapp.Location("name")
+    var list: ArrayList<com.dreamteam2.weatherapp.Location>? = ArrayList<com.dreamteam2.weatherapp.Location>()
+    list?.add(firsPer)
+     */
+    
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(20.dp)
+        .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+                locButton(viewModel)
+                locButton(viewModel)
+            }
+
+}
+
+@Composable
+fun locButton(viewModel: MainViewModel){
+    val coordinates by viewModel.coordinates.collectAsState()
+    Button(modifier = Modifier
+        .fillMaxSize()
+        .height(IntrinsicSize.Max)
+        .padding(15.dp),
+        onClick = { /*TODO*/ },
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = MaterialTheme.colors.primaryVariant,
+            contentColor = Color.Black)
+    ) {
+        Text(textAlign = TextAlign.Center, text = coordinates?.get(0)?.displayName.toString(), fontSize = 30.sp)
     }
 }
 
@@ -98,7 +275,8 @@ fun city(viewModel: MainViewModel){
     val coordinates by viewModel.coordinates.collectAsState()
     Text(
         //text = gridPointEndpoints?.properties?.relativeLocation?.properties?.city.toString() + ", " + gridPointEndpoints?.properties?.relativeLocation?.properties?.state.toString(),
-        text = coordinates?.get(0)?.lat.toString() + " " + coordinates?.get(0)?.lon.toString(),
+        //text = coordinates?.get(0)?.lat.toString() + " " + coordinates?.get(0)?.lon.toString(),
+        text = lat.toString() + " " + long.toString(),
         textAlign = TextAlign.Center,
         fontSize = 30.sp
     )
@@ -116,10 +294,10 @@ fun city(viewModel: MainViewModel){
 fun today(viewModel: MainViewModel){
     val forecastHourly by viewModel.forecastHourly.collectAsState()
     val gridpointProperties by viewModel.gridpointsProperties.collectAsState()
-    val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
     Column(
         modifier = Modifier
             .background(MaterialTheme.colors.primaryVariant, shape = RoundedCornerShape(25.dp))
+            .fillMaxSize()
     ){
         Row(
             modifier = Modifier
@@ -399,6 +577,69 @@ fun dataRow(leftText: String, rightText: String,){
                 textAlign = TextAlign.Center,
                 fontSize = 20.sp
             )
+        }
+    }
+}
+
+@Composable
+fun bottomNavBar(navController: NavController) {
+    val items = listOf(
+        NavigationItem.Home,
+        NavigationItem.Locations,
+    )
+    BottomNavigation(
+        backgroundColor = MaterialTheme.colors.primaryVariant,
+        contentColor = Color.White,
+
+        ){
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+        items.forEach { item ->
+            BottomNavigationItem(
+                icon = {
+                    Icon(
+                        painterResource(id = item.icon),
+                        contentDescription = item.title,
+                        Modifier.size(30.dp)
+                    )
+                },
+                label = { Text(text = item.title) },
+                selectedContentColor = Color.White,
+                unselectedContentColor = Color.Black.copy(0.4f),
+                alwaysShowLabel = true,
+                selected = currentRoute == item.route,
+                onClick = {
+                    navController.navigate(item.route) {
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route) {
+                                saveState = true
+                            }
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
+                }
+                //modifier = Modifier.size(5.dp, 5.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun navigation(navController: NavHostController, viewModel: MainViewModel) {
+    //val viewModel: MainViewModel = MainViewModel()
+    NavHost(navController, startDestination = NavigationItem.Home.route) {
+        composable(NavigationItem.Home.route) {
+            homeScreen(viewModel)
+        }
+        composable(NavigationItem.Locations.route) {
+            locs(viewModel)
         }
     }
 }
