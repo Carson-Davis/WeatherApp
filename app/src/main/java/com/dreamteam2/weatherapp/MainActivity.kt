@@ -201,7 +201,6 @@ fun mainLayout(viewModel: MainViewModel){
                         .wrapContentWidth(Alignment.Start)
                 ){
                     searchbar(viewModel)
-                    city(viewModel)
                 }
             }
         },
@@ -283,14 +282,10 @@ fun locButton(viewModel: MainViewModel){
  */
 @Composable
 fun city(viewModel: MainViewModel){
-    val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
-    val coordinates by viewModel.coordinates.collectAsState()
     val lat by viewModel.lat.collectAsState()
     val long by viewModel.long.collectAsState()
 
     Text(
-        //text = gridPointEndpoints?.properties?.relativeLocation?.properties?.city.toString() + ", " + gridPointEndpoints?.properties?.relativeLocation?.properties?.state.toString(),
-        //text = coordinates?.get(0)?.lat.toString() + " " + coordinates?.get(0)?.lon.toString(),
         text = lat.toString() + " " + long.toString(),
         textAlign = TextAlign.Center,
         fontSize = 30.sp
@@ -299,6 +294,9 @@ fun city(viewModel: MainViewModel){
 
 @Composable
 fun searchbar(viewModel: MainViewModel){
+    val lat by viewModel.lat.collectAsState()
+    val long by viewModel.long.collectAsState()
+    val gridPointEndpoints by viewModel.gridPointEndpoints.collectAsState()
     val searchTextState = remember { mutableStateOf(TextFieldValue("")) }
     Row(
         modifier = Modifier
@@ -315,7 +313,7 @@ fun searchbar(viewModel: MainViewModel){
             },
             placeholder = {
                 Text(
-                    text = "Enter city name",
+                    text = gridPointEndpoints?.properties?.relativeLocation?.properties?.city + ", " + gridPointEndpoints?.properties?.relativeLocation?.properties?.state,
                     color = MaterialTheme.colors.onPrimary
                 )
             },
@@ -356,7 +354,7 @@ fun searchbar(viewModel: MainViewModel){
                 cursorColor = Color.White,
                 leadingIconColor = Color.White,
                 trailingIconColor = Color.White,
-                backgroundColor = MaterialTheme.colors.primary,
+                backgroundColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent
