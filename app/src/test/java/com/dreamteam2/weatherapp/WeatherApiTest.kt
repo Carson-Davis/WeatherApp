@@ -37,7 +37,7 @@ class WeatherApiTest {
     fun testGetForecast()  = runTest {
         val getForecast = weatherApi.getForecast("TOP", 80, 31)
         assertEquals("us", getForecast?.propertiesInForecast?.type)
-    }git
+    }
 
     @Test
     fun testGetForecastHourly()  = runTest {
