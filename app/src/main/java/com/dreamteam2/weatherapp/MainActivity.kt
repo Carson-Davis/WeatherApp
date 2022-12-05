@@ -35,7 +35,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 
-var lat : Double = 0.0
+var lat : Double = 69.0
 var long : Double = 0.0
 
 /*
@@ -48,11 +48,10 @@ pulls from the API and builds the UI of the application.
 class MainActivity : ComponentActivity() {
     val viewModel: MainViewModel = MainViewModel()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
+        checkPermissions()
         requestNewLocationData()
         getLastLocation()
 
@@ -65,6 +64,11 @@ class MainActivity : ComponentActivity() {
     val PERMISSION_ID = 42
     lateinit var mFusedLocationClient: FusedLocationProviderClient
 
+    /*
+    fun getLastLocatino checks to see if the device allowed location permissions and gets the last known
+    location of the device if they are allowed by setting a lat and long variable equal to the coordinates
+    of the devices last location.
+     */
     @SuppressLint("MissingPermission")
     fun getLastLocation() {
         if (checkPermissions()) {
@@ -89,6 +93,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /*
+    fun requestNewLocationData grabs the most up-to-date location of the device for use in other functions
+     */
     @SuppressLint("MissingPermission")
     fun requestNewLocationData() {
         var mLocationRequest = LocationRequest()
@@ -106,7 +113,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private val mLocationCallback = object : LocationCallback() {
+    /*
+    fun onLocationResult allows for use of the variables lat and long within the other current
+    location functions.
+     */
+    val mLocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             var mLastLocation: Location = locationResult.lastLocation
             lat = mLastLocation.latitude
@@ -114,14 +125,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun isLocationEnabled(): Boolean {
+    /*
+    fun isLocationEnabled checks for enabled permissions through the provider so the function
+    itself can use the devices GPS
+     */
+    fun isLocationEnabled(): Boolean {
         var locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
             LocationManager.NETWORK_PROVIDER
         )
     }
 
-    private fun checkPermissions(): Boolean {
+    /*
+    fun checkPermissions checks to see if the user of the device has allowed usage of their location
+    @return boolean if the user has allowed permissions or not
+     */
+    fun checkPermissions(): Boolean {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_COARSE_LOCATION
@@ -136,7 +155,11 @@ class MainActivity : ComponentActivity() {
         return false
     }
 
-    private fun requestPermissions() {
+    /*
+    fun requestPermissions prompts the user when the application is opened to allow the use of their
+    location
+     */
+    fun requestPermissions() {
         ActivityCompat.requestPermissions(
             this,
             arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
@@ -144,6 +167,10 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    /*
+    fun onRequestPermissionsResult initiates the getLastLocation method if the permissions have been
+    granted
+     */
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == PERMISSION_ID) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
@@ -196,7 +223,12 @@ fun mainLayout(viewModel: MainViewModel){
         }
     }
     LaunchedEffect(true){
-        viewModel.fetchByString("Key West, Florida")
+        if(long == 0.0 || lat == 0.0) {
+            viewModel.fetchByString("Key West, Florida")
+        }
+        else {
+            viewModel.fetchByCoordinates(long, lat)
+        }
     }
 }
 
