@@ -56,6 +56,7 @@ import com.google.android.gms.location.*
 import kotlinx.coroutines.Delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlin.math.roundToLong
 
 /*
 MainActivity
@@ -238,6 +239,8 @@ fun homeScreen(viewModel: MainViewModel){
         dailyForecast(viewModel)
         Spacer(modifier = Modifier.height(15.dp))
         bottom(viewModel)
+        Spacer(modifier = Modifier.height(15.dp))
+        temperatureButton(viewModel)
         Spacer(modifier = Modifier.height(50.dp))
     }
 }
@@ -411,6 +414,7 @@ fun searchbar(viewModel: MainViewModel){
 fun today(viewModel: MainViewModel){
     val forecastHourly by viewModel.forecastHourly.collectAsState()
     val gridpointProperties by viewModel.gridpointsProperties.collectAsState()
+    val celsius by viewModel.isCelsius.collectAsState()
     Column(
         modifier = Modifier
             .background(MaterialTheme.colors.primaryVariant, shape = RoundedCornerShape(25.dp))
@@ -427,8 +431,18 @@ fun today(viewModel: MainViewModel){
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Center,
             ) {
+                var tempString: String = ""
+                var temperature: Double? = forecastHourly?.propertiesInForecast?.period?.get(0)?.temperature?.toDouble()
+                if(celsius == true){
+                    if (temperature != null) {
+                        tempString = ((temperature -32)*(0.55555)).roundToInt().toString()
+                    }
+                }
+                else{
+                    tempString = temperature?.roundToInt().toString()
+                }
                 Text(
-                    text = forecastHourly?.propertiesInForecast?.period?.get(0)?.temperature.toString() + "°",
+                    text = tempString + "°",
                     textAlign = TextAlign.Center,
                     modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
                     fontSize = 70.sp,
@@ -443,16 +457,25 @@ fun today(viewModel: MainViewModel){
                     )
                 }
                 Row {
-                    var aTemp: Double? =
-                        gridpointProperties?.properties?.apparentTemperature?.values?.get(0)?.value
+                    var aTemp: Long? =
+                        gridpointProperties?.properties?.apparentTemperature?.values?.get(0)?.value?.roundToLong()
                     var aTempString: String
+                    var sign: String = ""
                     if (aTemp == null) {
                         aTempString = "Loading"
                     } else {
-                        aTempString = (aTemp * 1.8 + 32).toString()
+                        if (celsius == false) {
+                            aTempString = (aTemp * 1.8 + 32).roundToInt().toString()
+                            sign = "F"
+                        }
+                        else{
+                            aTempString = aTemp.toString()
+                            sign = "C"
+                        }
                     }
+
                     Text(
-                        text = "Feels Like: " + aTempString + "°F",
+                        text = "Feels Like: " + aTempString + "°" + sign,
                         textAlign = TextAlign.Center,
                         modifier = Modifier,
                         fontSize = 20.sp
@@ -503,7 +526,13 @@ fun today(viewModel: MainViewModel){
                     if (minTemp == null) {
                         minTempString = "Loading"
                     } else {
-                        minTempString = (minTemp * 1.8 + 32).toString()
+                        if(celsius == false) {
+                            minTemp = (minTemp * 1.8) + 32
+                            minTempString = minTemp.roundToInt().toString()
+                        }
+                        else{
+                            minTempString = minTemp.roundToInt().toString()
+                        }
                     }
                     var maxTemp: Double? =
                         gridpointProperties?.properties?.maxTemperature?.values?.get(0)?.value
@@ -511,7 +540,12 @@ fun today(viewModel: MainViewModel){
                     if (maxTemp == null) {
                         maxTempString = "Loading"
                     } else {
-                        maxTempString = (maxTemp * 1.8 + 32).toString()
+                        if(celsius == false) {
+                            maxTempString = (maxTemp * 1.8 + 32).roundToInt().toString()
+                        }
+                        else{
+                            maxTempString = maxTemp.roundToInt().toString()
+                        }
                     }
                     Text(
                         text = "H: " + maxTempString + "°    " + "L: " + minTempString + "°",
@@ -537,6 +571,7 @@ fun today(viewModel: MainViewModel){
 @Composable
 fun hourly(viewModel: MainViewModel){
     val forecastHourly by viewModel.forecastHourly.collectAsState()
+    val celsius by viewModel.isCelsius.collectAsState()
     Column( modifier = Modifier
         .fillMaxWidth()
         .background(MaterialTheme.colors.primaryVariant, shape = RoundedCornerShape(25.dp))
@@ -546,48 +581,98 @@ fun hourly(viewModel: MainViewModel){
         Row(
             modifier = Modifier.padding(20.dp)
         ) {
-            forecastHourly?.let {
-                for (i in 0..13) {
-                    var allTimeStuff: String = it.propertiesInForecast?.period?.get(i)?.startTime.toString()
-                    var ending = "AM"
-                    allTimeStuff = allTimeStuff.substring(11, 13)
-                    if(allTimeStuff.toInt() > 11){
-                        ending = "PM"
-                    }
-                    if(allTimeStuff.toInt() % 12 == 0){
-                        allTimeStuff = "12"
-                    }
-                    else
-                    {
-                        allTimeStuff = (allTimeStuff.toInt() % 12).toString()
-                    }
-                    if(i == 0){
-                        ending = ""
-                        allTimeStuff = "Now"
-                    }
-                    Column() {
-                        Row(modifier = Modifier.padding(7.dp)) {
-                            Text(text = "$allTimeStuff",
-                                textAlign = TextAlign.Center,
-                                fontSize = 24.sp
-                                //fontWeight = FontWeight.Bold
-                            )
-                            Text(text = "$ending",
-                                //textAlign = TextAlign.Center,
-                                fontSize = 15.sp,
-                                modifier = Modifier.offset(0.dp, 9.dp)
-                            )
+            if(celsius == false){
+                forecastHourly?.let {
+                    for (i in 0..13) {
+                        var allTimeStuff: String = it.propertiesInForecast?.period?.get(i)?.startTime.toString()
+                        var ending = "AM"
+                        allTimeStuff = allTimeStuff.substring(11, 13)
+                        if(allTimeStuff.toInt() > 11){
+                            ending = "PM"
                         }
-                        Row(modifier = Modifier.padding(0.dp)) {
-                            Text(text = it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F   ",
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.offset(5.dp, 0.dp),
-                                fontSize = 24.sp
-                            )
+                        if(allTimeStuff.toInt() % 12 == 0){
+                            allTimeStuff = "12"
+                        }
+                        else
+                        {
+                            allTimeStuff = (allTimeStuff.toInt() % 12).toString()
+                        }
+                        if(i == 0){
+                            ending = ""
+                            allTimeStuff = "Now"
+                        }
+                        Column() {
+                            Row(modifier = Modifier.padding(7.dp)) {
+                                Text(text = "$allTimeStuff",
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 24.sp
+                                    //fontWeight = FontWeight.Bold
+                                )
+                                Text(text = "$ending",
+                                    //textAlign = TextAlign.Center,
+                                    fontSize = 15.sp,
+                                    modifier = Modifier.offset(0.dp, 9.dp)
+                                )
+                            }
+                            Row(modifier = Modifier.padding(0.dp)) {
+                                Text(text = it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F   ",
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.offset(5.dp, 0.dp),
+                                    fontSize = 24.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                forecastHourly?.let {
+                    for (i in 0..13) {
+                        var allTimeStuff: String = it.propertiesInForecast?.period?.get(i)?.startTime.toString()
+                        var ending = "AM"
+                        allTimeStuff = allTimeStuff.substring(11, 13)
+                        if(allTimeStuff.toInt() > 11){
+                            ending = "PM"
+                        }
+                        if(allTimeStuff.toInt() % 12 == 0){
+                            allTimeStuff = "12"
+                        }
+                        else
+                        {
+                            allTimeStuff = (allTimeStuff.toInt() % 12).toString()
+                        }
+                        if(i == 0){
+                            ending = ""
+                            allTimeStuff = "Now"
+                        }
+                        Column() {
+                            Row(modifier = Modifier.padding(7.dp)) {
+                                Text(text = "$allTimeStuff",
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 24.sp
+                                    //fontWeight = FontWeight.Bold
+                                )
+                                Text(text = "$ending",
+                                    //textAlign = TextAlign.Center,
+                                    fontSize = 15.sp,
+                                    modifier = Modifier.offset(0.dp, 9.dp)
+                                )
+                            }
+                            Row(modifier = Modifier.padding(0.dp)) {
+                                var temperature2 = it.propertiesInForecast?.period?.get(i)?.temperature?.toDouble()
+                                if (temperature2 != null) {
+                                    temperature2 = ((temperature2 - 32) * (0.5555))
+                                }
+                                Text(text = temperature2?.roundToInt().toString() + "°C   ",
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.offset(5.dp, 0.dp),
+                                    fontSize = 24.sp
+                                )
+                            }
                         }
                     }
                 }
             } ?: Text(text = "Loading...")
+
         }
     }
 }
@@ -605,6 +690,7 @@ fun hourly(viewModel: MainViewModel){
 @Composable
 fun dailyForecast(viewModel: MainViewModel) {
     val foreCastPointEndpointTemperature by viewModel.forecast.collectAsState()
+    val celsius by viewModel.isCelsius.collectAsState()
     Column(
         modifier = Modifier
             .background(MaterialTheme.colors.primaryVariant, shape = RoundedCornerShape(25.dp))
@@ -615,8 +701,17 @@ fun dailyForecast(viewModel: MainViewModel) {
         ) {
             foreCastPointEndpointTemperature?.let {
                 for (i in 0..13) {
-                    dataRow(it.propertiesInForecast?.period?.get(i)?.name.toString(), it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F")
+                    var temperature = it.propertiesInForecast?.period?.get(i)?.temperature
+                    if(celsius == false){
+                        dataRow(it.propertiesInForecast?.period?.get(i)?.name.toString(), temperature.toString() + "°F")
                 }
+                    else{
+                        if (temperature != null) {
+                            temperature = ((temperature - 32) * (0.55555)).toInt()
+                        }
+                        dataRow(it.propertiesInForecast?.period?.get(i)?.name.toString(), temperature.toString() + "°C")
+                    }
+                    }
             } ?: Text(text = "Loading...")
         }
     }
@@ -627,9 +722,11 @@ fun dailyForecast(viewModel: MainViewModel) {
 * Grabs the Dewpoint, Cloud Coverage, and Humididity data points from gridpointProperties and
 * passes the to the function dataRow to display them at the bottom of the screen
  */
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun bottom(viewModel: MainViewModel){
     val gridpointProperties by viewModel.gridpointsProperties.collectAsState()
+    val celsius by viewModel.isCelsius.collectAsState()
     Column( modifier = Modifier
         .fillMaxWidth()
         .background(MaterialTheme.colors.primaryVariant, shape = RoundedCornerShape(25.dp))
@@ -639,15 +736,26 @@ fun bottom(viewModel: MainViewModel){
             modifier = Modifier.padding(20.dp)
         ) {
             dataRow("Humidity", gridpointProperties?.properties?.relativeHumidity?.values?.get(0)?.value.toString() + " %")
-            var dewpoint: Double? =
-                gridpointProperties?.properties?.dewpoint?.values?.get(0)?.value
+            var dewpoint: Long? =
+                gridpointProperties?.properties?.dewpoint?.values?.get(0)?.value?.roundToLong()
             var dewpointString: String
             if (dewpoint == null) {
                 dewpointString = "Loading"
             } else {
-                dewpointString = (dewpoint * 1.8 + 32).toString()
+                if(celsius == true) {
+                    dewpointString = dewpoint.toString()
+                }
+                else{
+                    dewpointString = ((dewpoint * 1.8) + 32).toString()
+
+                }
             }
-            dataRow("Dewpoint", dewpointString + " °F")
+            if(celsius == true) {
+                dataRow("Dewpoint", dewpointString + " °C")
+            }
+            else{
+                dataRow("Dewpoint", dewpointString + " °F")
+            }
             dataRow("Cloud Coverage", gridpointProperties?.properties?.skyCover?.values?.get(0)?.value.toString() + " %")
             if (!(gridpointProperties?.properties?.potentialOf50mphWindGusts?.values.isNullOrEmpty())) {
                 dataRow("Wind Advisory", gridpointProperties?.properties?.potentialOf50mphWindGusts?.values.toString())
@@ -761,3 +869,19 @@ fun navigation(navController: NavHostController, viewModel: MainViewModel) {
     }
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
+@Composable
+fun temperatureButton(viewModel: MainViewModel) {
+    val celsius by viewModel.isCelsius.collectAsState()
+    Button(
+        onClick = { viewModel.isCelsius.value = !viewModel.isCelsius.value!! },
+        shape = RoundedCornerShape(20.dp)
+        ){
+        if(celsius == false) {
+            Text(text = "Celsius")
+        }
+        else{
+            Text(text = "Fahrenheit")
+        }
+    }
+}

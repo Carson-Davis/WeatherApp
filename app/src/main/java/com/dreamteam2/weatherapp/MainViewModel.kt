@@ -26,6 +26,8 @@ class MainViewModel: ViewModel() {
     private val coordinatesApi = CoordinatesAPI()
     val coordinates = MutableStateFlow<List<CoordinatesData>?>(null)
     val coordinatesData = MutableStateFlow<CoordinatesData?>(null)
+    val isCelsius = MutableStateFlow<Boolean?>(false)
+
 
     suspend fun getStatus(){
         //Call to WeatherAPI for the current status of the API
