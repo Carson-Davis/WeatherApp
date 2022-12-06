@@ -1,5 +1,6 @@
 package com.dreamteam2.weatherapp
 
+import androidx.compose.foundation.shape.CircleShape
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -87,14 +88,17 @@ class MainActivity : ComponentActivity() {
     fun getLastLocation() {
         if (checkPermissions()) {
             if (isLocationEnabled()) {
-
                 mFusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
                     var location: Location? = task.result
                     if (location == null) {
                         requestNewLocationData()
                     } else {
+                        requestNewLocationData()
                         viewModel.lat.value = location.latitude
                         viewModel.long.value = location.longitude
+                        runBlocking {
+                            viewModel.fetchByString(viewModel.lat.toString() + ", " + viewModel.long.toString())
+                        }
                     }
                 }
             } else {
@@ -109,7 +113,7 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("MissingPermission")
     fun requestNewLocationData() {
-        var mLocationRequest = LocationRequest()
+        var mLocationRequest = LocationRequest.create()
         mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         mLocationRequest.interval = 0
         mLocationRequest.fastestInterval = 0
@@ -338,19 +342,21 @@ fun currLocationButton(viewModel : MainViewModel){
         .width(100.dp)
         .height(IntrinsicSize.Min),
         onClick = {
-            /*
-            *  TODO: Make this button change the location in the search bar to the devices current
-            *  location and change the information displayed to the same
-            **/
-//            LaunchedEffect(true){
-//                viewModel.fetchByCoordinates(lat.toString(), long.toString())
-//            }
+            runBlocking {
+                viewModel.fetchByString(lat.toString() + ", " +  long.toString())
+            }
         },
+        border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
+        shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.colors.primaryVariant,
             contentColor = Color.White)
     ) {
-        Text(textAlign = TextAlign.Center, text = "Current Location", fontSize = 10.sp)
+        Image(
+            painterResource(id = R.drawable.waypoint_svgrepo_com),
+            contentDescription = "Current Location Button",
+            modifier = Modifier.size(50.dp)
+        )
     }
 }
 
