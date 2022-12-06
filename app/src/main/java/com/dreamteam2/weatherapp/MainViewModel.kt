@@ -101,20 +101,19 @@ class MainViewModel: ViewModel() {
         getHourlyForecast()
         getGridpointProperties()
     }
-
-    suspend fun fetchByCoordinates(lat : Double, long : Double){
-        kotlin.runCatching {
-            weatherApi.getGirdEndpoints(long, lat)
-        }.onSuccess {
-            gridPointEndpoints.value = it
-            getStatus()
-            getDailyForecast()
-            getHourlyForecast()
-            getGridpointProperties()
-        }.onFailure {
-            gridPointEndpoints.value = null
-        }
-
-    }
+//    suspend fun fetchByCoordinates(lat : Double, long : Double){
+//        kotlin.runCatching {
+//            weatherApi.getGirdEndpoints(long, lat)
+//        }.onSuccess {
+//            gridPointEndpoints.value = it
+//            getStatus()
+//            getDailyForecast()
+//            getHourlyForecast()
+//            getGridpointProperties()
+//        }.onFailure {
+//            gridPointEndpoints.value = null
+//        }
+//
+//    }
 }
 

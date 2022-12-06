@@ -1,5 +1,6 @@
 package com.dreamteam2.weatherapp
 
+import androidx.compose.foundation.shape.CircleShape
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -95,6 +96,9 @@ class MainActivity : ComponentActivity() {
                         requestNewLocationData()
                         viewModel.lat.value = location.latitude
                         viewModel.long.value = location.longitude
+                        runBlocking {
+                            viewModel.fetchByString(viewModel.lat.toString() + ", " + viewModel.long.toString())
+                        }
                     }
                 }
             } else {
@@ -338,14 +342,20 @@ fun currLocationButton(viewModel : MainViewModel){
         .height(IntrinsicSize.Min),
         onClick = {
             runBlocking {
-                viewModel.fetchByCoordinates(lat, long)
+                viewModel.fetchByString(lat.toString() + ", " +  long.toString())
             }
         },
+        border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
+        shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.colors.primaryVariant,
             contentColor = Color.White)
     ) {
-        Text(textAlign = TextAlign.Center, text = lat.toString() + ", " + long.toString(), fontSize = 10.sp)
+        Image(
+            painterResource(id = R.drawable.waypoint_svgrepo_com),
+            contentDescription = "Current Location Button",
+            modifier = Modifier.size(50.dp)
+        )
     }
 }
 
