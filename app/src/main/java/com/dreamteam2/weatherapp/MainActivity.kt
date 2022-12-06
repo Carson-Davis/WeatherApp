@@ -246,10 +246,8 @@ fun homeScreen(viewModel: MainViewModel){
         Spacer(modifier = Modifier.height(15.dp))
         bottom(viewModel)
         Spacer(modifier = Modifier.height(15.dp))
-        //readFromInternalStorage(context = LocalContext.current)
-        //Spacer(modifier = Modifier.height(15.dp))
         saveLocation(viewModel)
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(5.dp))
         temperatureButton(viewModel)
         Spacer(modifier = Modifier.height(50.dp))
 
@@ -304,9 +302,11 @@ fun locButton(viewModel: MainViewModel, name: String, navController: NavControll
             }
             navController.navigate("home")
         },
-        border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
+        //border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
         shape = RoundedCornerShape(10),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.primaryVariant)
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = MaterialTheme.colors.primaryVariant,
+            contentColor = Color.Black)
         /*
 colors = ButtonDefaults.buttonColors(
     backgroundColor = MaterialTheme.colors.primaryVariant,
@@ -323,9 +323,15 @@ colors = ButtonDefaults.buttonColors(
                     saveToInternalStorage(context, saveStr)
                     navController.navigate("home")
                 },
-                border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
+                elevation =  ButtonDefaults.elevation(
+                    defaultElevation = 10.dp,
+                    pressedElevation = 15.dp,
+                    disabledElevation = 0.dp),
                 shape = RoundedCornerShape(50),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.primaryVariant)) {
+                border = BorderStroke(1.dp,Color.Black),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.primaryVariant,
+                    contentColor = Color.Black)) {
                 Text(textAlign = TextAlign.Center, text = "Delete", fontSize = 30.sp, modifier = Modifier.padding(10.dp))
             }
         }
@@ -861,11 +867,14 @@ fun saveLocation(viewModel: MainViewModel){
 
                 saveToInternalStorage(context, saveStr)
             },
-            border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
+            //border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
             shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.primaryVariant)
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.primaryVariant,
+                contentColor = Color.Black
+            )
         ) {
-            Text(textAlign = TextAlign.Center, text = "Save Location", fontSize = 30.sp)
+            Text(textAlign = TextAlign.Center, text = "Save Location", fontSize = 20.sp)
         }
     }
 }
@@ -1010,8 +1019,16 @@ fun temperatureButton(viewModel: MainViewModel) {
     val celsius by viewModel.isCelsius.collectAsState()
     Button(
         onClick = { viewModel.isCelsius.value = !viewModel.isCelsius.value!! },
-        shape = RoundedCornerShape(20.dp)
-        ){
+        elevation =  ButtonDefaults.elevation(
+            defaultElevation = 10.dp,
+            pressedElevation = 15.dp,
+            disabledElevation = 0.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = MaterialTheme.colors.primaryVariant,
+            contentColor = Color.Black
+        ),
+        modifier = Modifier.height(40.dp).width(130.dp)){
         if(celsius == false) {
             Text(text = "Celsius")
         }
