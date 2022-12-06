@@ -624,21 +624,21 @@ fun today(viewModel: MainViewModel){
                     if (aTemp == null) {
                         windDString = "Loading"
                     }else if (22.0 < windD!! && windD!! <  68.0){
-                        windDString = "NE"
+                        windDString = "NE ⬋"
                     }else if (67.0 < windD!! && windD!! <  113.0){
-                        windDString = "E"
+                        windDString = "E ⬅"
                     }else if (112.0 < windD!! && windD!! <  158.0){
-                        windDString = "SE"
+                        windDString = "SE ⬉"
                     }else if (157.0 < windD!! && windD!! <  203.0){
-                        windDString = "S"
+                        windDString = "S ⬆"
                     }else if (202.0 < windD!! && windD!! <  248.0){
-                        windDString = "SW"
+                        windDString = "SW ⬈"
                     }else if (247.0 < windD!! && windD!! <  293.0){
-                        windDString = "W"
+                        windDString = "W ⮕"
                     }else if (292.0 < windD!! && windD!! <  338.0){
-                        windDString = "NW"
+                        windDString = "NW ⬊"
                     }else{
-                        windDString = "N"
+                        windDString = "N ⬇"
                     }
                     Text(
                         text = "Wind: " + windSString + " mph " + windDString,
