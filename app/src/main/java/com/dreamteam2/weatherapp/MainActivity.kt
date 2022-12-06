@@ -57,9 +57,6 @@ import kotlinx.coroutines.Delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-var lat : Double = 0.0
-var long : Double = 0.0
-
 /*
 MainActivity
 -------------------------------------------------------------
@@ -202,6 +199,13 @@ fun mainLayout(viewModel: MainViewModel){
                 ){
                     searchbar(viewModel)
                 }
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                ){
+                    currLocationButton(viewModel)
+                }
+
             }
         },
         bottomBar = {
@@ -262,15 +266,38 @@ fun locs(viewModel: MainViewModel){
 fun locButton(viewModel: MainViewModel){
     val coordinates by viewModel.coordinates.collectAsState()
     Button(modifier = Modifier
-        .fillMaxSize()
-        .height(IntrinsicSize.Max)
         .padding(15.dp),
         onClick = { /*TODO*/ },
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.colors.primaryVariant,
             contentColor = Color.Black)
     ) {
-        Text(textAlign = TextAlign.Center, text = coordinates?.get(0)?.displayName.toString(), fontSize = 30.sp)
+        Text(text = coordinates?.get(0)?.displayName.toString(), fontSize = 10.sp)
+    }
+}
+
+
+@Composable
+fun currLocationButton(viewModel : MainViewModel){
+    val lat by viewModel.lat.collectAsState()
+    val long by viewModel.long.collectAsState()
+    Button(modifier = Modifier
+        .width(100.dp)
+        .height(IntrinsicSize.Min),
+        onClick = {
+            /*
+            *  TODO: Make this button change the location in the search bar to the devices current
+            *  location and change the information displayed to the same
+            **/
+            LaunchedEffect(true){
+                viewModel.fetchByCoordinates(lat.toString(), long.toString())
+            }
+        },
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = MaterialTheme.colors.primaryVariant,
+            contentColor = Color.White)
+    ) {
+        Text(textAlign = TextAlign.Center, text = "Current Location", fontSize = 10.sp)
     }
 }
 
@@ -300,7 +327,7 @@ fun searchbar(viewModel: MainViewModel){
     val searchTextState = remember { mutableStateOf(TextFieldValue("")) }
     Row(
         modifier = Modifier
-            .fillMaxWidth()
+            .width(350.dp)
             .height(IntrinsicSize.Min)
     ) {
         TextField(
