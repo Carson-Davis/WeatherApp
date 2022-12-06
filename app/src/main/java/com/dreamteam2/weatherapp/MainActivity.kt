@@ -286,6 +286,7 @@ fun locs(viewModel: MainViewModel, context: Context, navController: NavControlle
                 for (str:String in locArray){
                     locButton(viewModel, str, navController, context)
                 }
+        Spacer(modifier = Modifier.height(50.dp))
             }
 
 }
@@ -364,6 +365,7 @@ fun currLocationButton(viewModel : MainViewModel){
 * @param MainViewModel
 * Displays location name and coordinates on UI.
 *
+* Design pattern implementation - State
  */
 @Composable
 fun city(viewModel: MainViewModel){
@@ -464,6 +466,7 @@ fun searchbar(viewModel: MainViewModel){
 * direction, and a high-low temperature for the day. Along with styling elements.
 * @param MainViewModel
 *
+* Design pattern implementation - State
  */
 @Composable
 fun today(viewModel: MainViewModel){
@@ -624,6 +627,8 @@ fun today(viewModel: MainViewModel){
  * The information is organized in a Jetpack Compose Row
  *
  * @param MainViewModel
+ *
+ * Design pattern implementation - State
  */
 @Composable
 fun hourly(viewModel: MainViewModel){
@@ -743,6 +748,8 @@ fun hourly(viewModel: MainViewModel){
  * All units are in degrees Fahrenheit
  *
  * @param MainViewModel
+ *
+ * Design pattern implementation - State
  */
 @Composable
 fun dailyForecast(viewModel: MainViewModel) {
@@ -777,7 +784,9 @@ fun dailyForecast(viewModel: MainViewModel) {
 * fun bottom
 * @param MainViewModel
 * Grabs the Dewpoint, Cloud Coverage, and Humididity data points from gridpointProperties and
-* passes the to the function dataRow to display them at the bottom of the screen
+* passes the to the function dataRow to display them at the bottom of the screen.
+*
+* Design pattern implementation - State
  */
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
