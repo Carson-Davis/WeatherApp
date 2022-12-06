@@ -267,8 +267,9 @@ fun homeScreen(viewModel: MainViewModel){
                 fontSize = 30.sp,
                 color = MaterialTheme.colors.primary
             )
-        } else if (loadStatus == MainViewModel.LoadStatus.success
-            && forecastHourly?.propertiesInForecast?.period?.isNotEmpty()!!
+        } else if (
+            loadStatus == MainViewModel.LoadStatus.success
+//            && forecastHourly?.propertiesInForecast?.period?.isNotEmpty()!!
             && foreCastPointEndpointTemperature?.propertiesInForecast?.period?.isNotEmpty()!!
         ) {
             today(viewModel)
@@ -293,6 +294,8 @@ fun homeScreen(viewModel: MainViewModel){
                 color = MaterialTheme.colors.primary
             )
         }
+
+
     }
 }
 
@@ -539,14 +542,16 @@ fun today(viewModel: MainViewModel){
             ) {
 
                 var tempString: String = ""
-                var temperature: Double? = forecastHourly?.propertiesInForecast?.period?.get(0)?.temperature?.toDouble()
-                if(celsius == true){
-                    if (temperature != null) {
-                        tempString = ((temperature -32)*(0.55555)).roundToInt().toString()
+                if (forecastHourly?.propertiesInForecast?.period?.isNotEmpty() == true){
+                    var temperature: Double? = forecastHourly?.propertiesInForecast?.period?.get(0)?.temperature?.toDouble()
+                    if(celsius == true){
+                        if (temperature != null) {
+                            tempString = ((temperature -32)*(0.55555)).roundToInt().toString()
+                        }
                     }
-                }
-                else{
-                    tempString = temperature?.roundToInt().toString()
+                    else{
+                        tempString = temperature?.roundToInt().toString()
+                    }
                 }
 
                 Text(
@@ -558,11 +563,13 @@ fun today(viewModel: MainViewModel){
             }
             Column{
                 Row{
-                    Text(
-                        text = forecastHourly?.propertiesInForecast?.period?.get(0)?.shortForecast.toString(),
-                        modifier = Modifier,
-                        fontSize = 25.sp,
-                    )
+                    if(forecastHourly?.propertiesInForecast?.period?.isNotEmpty() == true){
+                        Text(
+                            text = forecastHourly?.propertiesInForecast?.period?.get(0)?.shortForecast.toString(),
+                            modifier = Modifier,
+                            fontSize = 25.sp,
+                        )
+                    }
                 }
                 Row {
                     var aTemp: Long? =
@@ -694,42 +701,44 @@ fun hourly(viewModel: MainViewModel){
             if(celsius == false){
                 forecastHourly?.let {
                     for (i in 0..13) {
-                        var allTimeStuff: String = it.propertiesInForecast?.period?.get(i)?.startTime.toString()
-                        var ending = "AM"
-                        allTimeStuff = allTimeStuff.substring(11, 13)
-                        if(allTimeStuff.toInt() > 11){
-                            ending = "PM"
-                        }
-                        if(allTimeStuff.toInt() % 12 == 0){
-                            allTimeStuff = "12"
-                        }
-                        else
-                        {
-                            allTimeStuff = (allTimeStuff.toInt() % 12).toString()
-                        }
-                        if(i == 0){
-                            ending = ""
-                            allTimeStuff = "Now"
-                        }
-                        Column() {
-                            Row(modifier = Modifier.padding(7.dp)) {
-                                Text(text = "$allTimeStuff",
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 24.sp
-                                    //fontWeight = FontWeight.Bold
-                                )
-                                Text(text = "$ending",
-                                    //textAlign = TextAlign.Center,
-                                    fontSize = 15.sp,
-                                    modifier = Modifier.offset(0.dp, 9.dp)
-                                )
+                        if(it.propertiesInForecast?.period?.isNotEmpty() == true){
+                            var allTimeStuff: String = it.propertiesInForecast?.period?.get(i)?.startTime.toString()
+                            var ending = "AM"
+                            allTimeStuff = allTimeStuff.substring(11, 13)
+                            if(allTimeStuff.toInt() > 11){
+                                ending = "PM"
                             }
-                            Row(modifier = Modifier.padding(0.dp)) {
-                                Text(text = it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F   ",
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.offset(5.dp, 0.dp),
-                                    fontSize = 24.sp
-                                )
+                            if(allTimeStuff.toInt() % 12 == 0){
+                                allTimeStuff = "12"
+                            }
+                            else
+                            {
+                                allTimeStuff = (allTimeStuff.toInt() % 12).toString()
+                            }
+                            if(i == 0){
+                                ending = ""
+                                allTimeStuff = "Now"
+                            }
+                            Column() {
+                                Row(modifier = Modifier.padding(7.dp)) {
+                                    Text(text = "$allTimeStuff",
+                                        textAlign = TextAlign.Center,
+                                        fontSize = 24.sp
+                                        //fontWeight = FontWeight.Bold
+                                    )
+                                    Text(text = "$ending",
+                                        //textAlign = TextAlign.Center,
+                                        fontSize = 15.sp,
+                                        modifier = Modifier.offset(0.dp, 9.dp)
+                                    )
+                                }
+                                Row(modifier = Modifier.padding(0.dp)) {
+                                    Text(text = it.propertiesInForecast?.period?.get(i)?.temperature.toString() + "°F   ",
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.offset(5.dp, 0.dp),
+                                        fontSize = 24.sp
+                                    )
+                                }
                             }
                         }
                     }
