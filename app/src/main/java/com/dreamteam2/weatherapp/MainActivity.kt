@@ -280,14 +280,14 @@ fun locs(viewModel: MainViewModel, context: Context, navController: NavControlle
         .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally) {
                 for (str:String in locArray){
-                    locButton(viewModel, str, navController)
+                    locButton(viewModel, str, navController, context)
                 }
             }
 
 }
 
 @Composable
-fun locButton(viewModel: MainViewModel, name: String, navController: NavController){
+fun locButton(viewModel: MainViewModel, name: String, navController: NavController, context: Context){
     val coordinates by viewModel.coordinates.collectAsState()
     Button(modifier = Modifier
         .fillMaxSize()
@@ -300,7 +300,7 @@ fun locButton(viewModel: MainViewModel, name: String, navController: NavControll
             navController.navigate("home")
         },
         border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
-        shape = RoundedCornerShape(50),
+        shape = RoundedCornerShape(10),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.primaryVariant)
         /*
 colors = ButtonDefaults.buttonColors(
@@ -309,7 +309,21 @@ colors = ButtonDefaults.buttonColors(
 
          */
     ) {
-        Text(textAlign = TextAlign.Center, text = name, fontSize = 30.sp, modifier = Modifier.padding(10.dp))
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(textAlign = TextAlign.Center, text = name, fontSize = 30.sp, modifier = Modifier.padding(15.dp))
+            Button(
+                onClick = {
+                    var saveStr:String = readFromInternalStorage(context)
+                    saveStr = saveStr.replace(name, "")
+                    saveToInternalStorage(context, saveStr)
+                    navController.navigate("home")
+                },
+                border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.primaryVariant)) {
+                Text(textAlign = TextAlign.Center, text = "Delete", fontSize = 30.sp, modifier = Modifier.padding(10.dp))
+            }
+        }
     }
 }
 
@@ -846,6 +860,7 @@ fun saveToInternalStorage(context: Context, msg: String) {
         fos.flush()
         fos.close()
      }
+
 
 fun readFromInternalStorage(context: Context): String {
 
