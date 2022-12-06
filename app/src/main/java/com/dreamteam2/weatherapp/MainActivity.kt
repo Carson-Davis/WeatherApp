@@ -288,11 +288,17 @@ fun locButton(viewModel: MainViewModel, name: String, navController: NavControll
                   }
             navController.navigate("home")
         },
+        border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
+        shape = RoundedCornerShape(50),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.primaryVariant)
+                /*
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.colors.primaryVariant,
             contentColor = Color.Black)
+
+                 */
     ) {
-        Text(textAlign = TextAlign.Center, text = name, fontSize = 30.sp)
+        Text(textAlign = TextAlign.Center, text = name, fontSize = 30.sp, modifier = Modifier.padding(10.dp))
     }
 }
 
@@ -666,13 +672,18 @@ fun saveLocation(viewModel: MainViewModel){
             onClick = {
 
                 var saveStr:String = readFromInternalStorage(context)
-                saveStr = saveStr + "\n" + coordinates?.get(0)?.displayName.toString()
+                try {
+                    saveStr = saveStr + "\n" + coordinates?.get(0)?.displayName.toString()
+                }
+                catch (e: java.lang.IndexOutOfBoundsException){
+
+                }
 
                 saveToInternalStorage(context, saveStr)
             },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.primaryVariant,
-                contentColor = Color.Black)
+            border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
+            shape = RoundedCornerShape(50),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.primaryVariant)
         ) {
             Text(textAlign = TextAlign.Center, text = "Save Location", fontSize = 30.sp)
         }
