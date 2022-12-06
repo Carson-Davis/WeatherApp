@@ -428,6 +428,7 @@ fun today(viewModel: MainViewModel){
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Center,
             ) {
+
                 Text(
                     text = forecastHourly?.propertiesInForecast?.period?.get(0)?.temperature.toString() + "°",
                     textAlign = TextAlign.Center,
@@ -673,7 +674,9 @@ fun saveLocation(viewModel: MainViewModel){
 
                 var saveStr:String = readFromInternalStorage(context)
                 try {
-                    saveStr = saveStr + "\n" + coordinates?.get(0)?.displayName.toString()
+                    if (!saveStr.contains(coordinates?.get(0)?.displayName.toString())) {
+                        saveStr = saveStr + "\n" + coordinates?.get(0)?.displayName.toString()
+                    }
                 }
                 catch (e: java.lang.IndexOutOfBoundsException){
 
