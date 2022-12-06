@@ -36,6 +36,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
@@ -44,6 +45,7 @@ import androidx.lifecycle.viewModelScope
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
@@ -238,14 +240,15 @@ fun homeScreen(viewModel: MainViewModel){
     val status by viewModel.status.collectAsState()
     val forecastHourly by viewModel.forecastHourly.collectAsState()
     val foreCastPointEndpointTemperature by viewModel.forecast.collectAsState()
+    val gridpointProperties by viewModel.gridpointsProperties.collectAsState()
 
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(20.dp)
+        .padding(horizontal = 20.dp)
         .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
+        Spacer(modifier = Modifier.height(15.dp))
         if (status == null && loadStatus == MainViewModel.LoadStatus.error) {
             Text(
                 text = "Connection Error...",
@@ -267,21 +270,31 @@ fun homeScreen(viewModel: MainViewModel){
                 fontSize = 30.sp,
                 color = MaterialTheme.colors.primary
             )
-        } else if (
-            loadStatus == MainViewModel.LoadStatus.success
-//            && forecastHourly?.propertiesInForecast?.period?.isNotEmpty()!!
-            && foreCastPointEndpointTemperature?.propertiesInForecast?.period?.isNotEmpty()!!
-        ) {
-            today(viewModel)
+        } else if (loadStatus == MainViewModel.LoadStatus.success) {
+            if(gridpointProperties?.properties?.apparentTemperature?.values?.isNotEmpty() == true || forecastHourly?.propertiesInForecast?.period?.isNotEmpty() == true){
+                today(viewModel)
+            }else{
+                Text(text ="Today view has been excluded given current temperature and other data has not been published for the requested location at this time", color = MaterialTheme.colors.primary)
+            }
             Spacer(modifier = Modifier.height(15.dp))
-            hourly(viewModel)
+            if(forecastHourly?.propertiesInForecast?.period?.isNotEmpty() == true){
+                hourly(viewModel)
+            }else{
+                Text(text ="Hourly view has been excluded given forecast data has not been published for the requested location at this time", color = MaterialTheme.colors.primary)
+            }
             Spacer(modifier = Modifier.height(15.dp))
-            dailyForecast(viewModel)
+            if (foreCastPointEndpointTemperature?.propertiesInForecast?.period?.isNotEmpty() == true){
+                dailyForecast(viewModel)
+            }else{
+                Text(text ="Daily view has been excluded given forecast data has not been published for the requested location at this time", color = MaterialTheme.colors.primary)
+            }
             Spacer(modifier = Modifier.height(15.dp))
-            bottom(viewModel)
+            if(gridpointProperties?.properties?.apparentTemperature?.values?.isNotEmpty() == true){
+                bottom(viewModel)
+            }else{
+                Text(text ="Data view has been excluded given data has not been published for the requested location at this time", color = MaterialTheme.colors.primary)
+            }
             Spacer(modifier = Modifier.height(15.dp))
-            //readFromInternalStorage(context = LocalContext.current)
-            //Spacer(modifier = Modifier.height(15.dp))
             saveLocation(viewModel)
             Spacer(modifier = Modifier.height(15.dp))
             temperatureButton(viewModel)
@@ -294,8 +307,7 @@ fun homeScreen(viewModel: MainViewModel){
                 color = MaterialTheme.colors.primary
             )
         }
-
-
+        Spacer(modifier = Modifier.height(15.dp))
     }
 }
 
@@ -389,24 +401,19 @@ colors = ButtonDefaults.buttonColors(
 fun currLocationButton(viewModel : MainViewModel){
     val lat by viewModel.lat.collectAsState()
     val long by viewModel.long.collectAsState()
-    Button(modifier = Modifier
-        .width(100.dp)
-        .height(IntrinsicSize.Min),
+    IconButton(
         onClick = {
             runBlocking {
                 viewModel.fetchByString(lat.toString() + ", " +  long.toString())
             }
-        },
-        border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
-        shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = MaterialTheme.colors.primaryVariant,
-            contentColor = Color.White)
+        }
     ) {
-        Image(
-            painterResource(id = R.drawable.waypoint_svgrepo_com),
-            contentDescription = "Current Location Button",
-            modifier = Modifier.size(50.dp)
+        Icon(
+            Icons.Default.LocationOn,
+            contentDescription = "",
+            modifier = Modifier
+                .padding(15.dp)
+                .size(24.dp),
         )
     }
 }
@@ -441,18 +448,16 @@ fun searchbar(viewModel: MainViewModel){
             .width(350.dp)
             .height(IntrinsicSize.Min)
     ) {
+        val focusManager = LocalFocusManager.current
         TextField(
             value = searchTextState.value,
             onValueChange = { value ->
                 searchTextState.value = value
-                runBlocking {
-                    viewModel.fetchByString(searchString = searchTextState.value.toString())
-                }
             },
             placeholder = {
                 Text(
                     text = gridPointEndpoints?.properties?.relativeLocation?.properties?.city + ", " + gridPointEndpoints?.properties?.relativeLocation?.properties?.state,
-                    color = MaterialTheme.colors.onPrimary
+                    color = Color.Black
                 )
             },
             modifier = Modifier
@@ -488,10 +493,10 @@ fun searchbar(viewModel: MainViewModel){
             singleLine = true,
             shape = RectangleShape, // The TextFiled has rounded corners top left and right by default
             colors = TextFieldDefaults.textFieldColors(
-                textColor = Color.White,
+                textColor = Color.Black,
                 cursorColor = Color.White,
-                leadingIconColor = Color.White,
-                trailingIconColor = Color.White,
+                leadingIconColor = Color.Black,
+                trailingIconColor = Color.Black,
                 backgroundColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
@@ -502,7 +507,8 @@ fun searchbar(viewModel: MainViewModel){
                     viewModel.viewModelScope.launch {
                         viewModel.fetchByString(searchString = searchTextState.value.text)
                     }
-                    // focusManager.clearFocus()
+                    focusManager.clearFocus()
+                    searchTextState.value = TextFieldValue("")
                 },
             )
         )
@@ -534,15 +540,14 @@ fun today(viewModel: MainViewModel){
                 .padding(20.dp)
                 .height(IntrinsicSize.Max)
         ){
-            Column(
-                modifier = Modifier
-                    .width(130.dp)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.Center,
-            ) {
-
-                var tempString: String = ""
-                if (forecastHourly?.propertiesInForecast?.period?.isNotEmpty() == true){
+            if (forecastHourly?.propertiesInForecast?.period?.isNotEmpty() == true){
+                Column(
+                    modifier = Modifier
+                        .width(130.dp)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    var tempString: String = ""
                     var temperature: Double? = forecastHourly?.propertiesInForecast?.period?.get(0)?.temperature?.toDouble()
                     if(celsius == true){
                         if (temperature != null) {
@@ -552,18 +557,17 @@ fun today(viewModel: MainViewModel){
                     else{
                         tempString = temperature?.roundToInt().toString()
                     }
+                    Text(
+                        text = tempString + "°",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
+                        fontSize = 70.sp,
+                    )
                 }
-
-                Text(
-                    text = tempString + "°",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
-                    fontSize = 70.sp,
-                )
             }
             Column{
-                Row{
-                    if(forecastHourly?.propertiesInForecast?.period?.isNotEmpty() == true){
+                if(forecastHourly?.propertiesInForecast?.period?.isNotEmpty() == true) {
+                    Row {
                         Text(
                             text = forecastHourly?.propertiesInForecast?.period?.get(0)?.shortForecast.toString(),
                             modifier = Modifier,
@@ -571,102 +575,103 @@ fun today(viewModel: MainViewModel){
                         )
                     }
                 }
-                Row {
-                    var aTemp: Long? =
-                        gridpointProperties?.properties?.apparentTemperature?.values?.get(0)?.value?.roundToLong()
-                    var aTempString: String
-                    var sign: String = ""
-                    if (aTemp == null) {
-                        aTempString = "Loading"
-                    } else {
-                        if (celsius == false) {
-                            aTempString = (aTemp * 1.8 + 32).roundToInt().toString()
-                            sign = "F"
+                if(gridpointProperties?.properties?.apparentTemperature?.values?.isNotEmpty() == true){
+                    Row {
+                        var aTemp: Long? =
+                            gridpointProperties?.properties?.apparentTemperature?.values?.get(0)?.value?.roundToLong()
+                        var aTempString: String
+                        var sign: String = ""
+                        if (aTemp == null) {
+                            aTempString = "Loading"
+                        } else {
+                            if (celsius == false) {
+                                aTempString = (aTemp * 1.8 + 32).roundToInt().toString()
+                                sign = "F"
+                            }
+                            else{
+                                aTempString = aTemp.toString()
+                                sign = "C"
+                            }
                         }
-                        else{
-                            aTempString = aTemp.toString()
-                            sign = "C"
-                        }
-                    }
 
-                    Text(
-                        text = "Feels Like: " + aTempString + "°" + sign,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier,
-                        fontSize = 20.sp
-                    )
-                }
-                Row{
-                    var aTemp: Double? =
-                        gridpointProperties?.properties?.apparentTemperature?.values?.get(0)?.value
-                    var windS: Double? = gridpointProperties?.properties?.windSpeed?.values?.get(0)?.value
-                    var windSString: String
-                    if (windS == null){
-                        windSString = "Loading"
-                    }else{
-                        windSString = ((windS * 0.621371192).roundToInt()).toString()
+                        Text(
+                            text = "Feels Like: " + aTempString + "°" + sign,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier,
+                            fontSize = 20.sp
+                        )
                     }
-                    var windD: Double? = gridpointProperties?.properties?.windDirection?.values?.get(0)?.value
-                    var windDString: String
-                    if (aTemp == null) {
-                        windDString = "Loading"
-                    }else if (22.0 < windD!! && windD!! <  68.0){
-                        windDString = "NE ⬋"
-                    }else if (67.0 < windD!! && windD!! <  113.0){
-                        windDString = "E ⬅"
-                    }else if (112.0 < windD!! && windD!! <  158.0){
-                        windDString = "SE ⬉"
-                    }else if (157.0 < windD!! && windD!! <  203.0){
-                        windDString = "S ⬆"
-                    }else if (202.0 < windD!! && windD!! <  248.0){
-                        windDString = "SW ⬈"
-                    }else if (247.0 < windD!! && windD!! <  293.0){
-                        windDString = "W ⮕"
-                    }else if (292.0 < windD!! && windD!! <  338.0){
-                        windDString = "NW ⬊"
-                    }else{
-                        windDString = "N ⬇"
+                    Row{
+                        var aTemp: Double? =
+                            gridpointProperties?.properties?.apparentTemperature?.values?.get(0)?.value
+                        var windS: Double? = gridpointProperties?.properties?.windSpeed?.values?.get(0)?.value
+                        var windSString: String
+                        if (windS == null){
+                            windSString = "Loading"
+                        }else{
+                            windSString = ((windS * 0.621371192).roundToInt()).toString()
+                        }
+                        var windD: Double? = gridpointProperties?.properties?.windDirection?.values?.get(0)?.value
+                        var windDString: String
+                        if (aTemp == null) {
+                            windDString = "Loading"
+                        }else if (22.0 < windD!! && windD!! <  68.0){
+                            windDString = "NE ⬋"
+                        }else if (67.0 < windD!! && windD!! <  113.0){
+                            windDString = "E ⬅"
+                        }else if (112.0 < windD!! && windD!! <  158.0){
+                            windDString = "SE ⬉"
+                        }else if (157.0 < windD!! && windD!! <  203.0){
+                            windDString = "S ⬆"
+                        }else if (202.0 < windD!! && windD!! <  248.0){
+                            windDString = "SW ⬈"
+                        }else if (247.0 < windD!! && windD!! <  293.0){
+                            windDString = "W ⮕"
+                        }else if (292.0 < windD!! && windD!! <  338.0){
+                            windDString = "NW ⬊"
+                        }else{
+                            windDString = "N ⬇"
+                        }
+                        Text(
+                            text = "Wind: " + windSString + " mph " + windDString,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier,
+                            fontSize = 20.sp
+                        )
                     }
-                    Text(
-                        text = "Wind: " + windSString + " mph " + windDString,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier,
-                        fontSize = 20.sp
-                    )
-                }
-                Row {
-                    var minTemp: Double? =
-                        gridpointProperties?.properties?.minTemperature?.values?.get(0)?.value
-                    var minTempString: String
-                    if (minTemp == null) {
-                        minTempString = "Loading"
-                    } else {
-                        if(celsius == false) {
-                            minTemp = (minTemp * 1.8) + 32
-                            minTempString = minTemp.roundToInt().toString()
+                    Row {
+                        var minTemp: Double? =
+                            gridpointProperties?.properties?.minTemperature?.values?.get(0)?.value
+                        var minTempString: String
+                        if (minTemp == null) {
+                            minTempString = "Loading"
+                        } else {
+                            if(celsius == false) {
+                                minTemp = (minTemp * 1.8) + 32
+                                minTempString = minTemp.roundToInt().toString()
+                            }
+                            else{
+                                minTempString = minTemp.roundToInt().toString()
+                            }
                         }
-                        else{
-                            minTempString = minTemp.roundToInt().toString()
+                        var maxTemp: Double? =
+                            gridpointProperties?.properties?.maxTemperature?.values?.get(0)?.value
+                        var maxTempString: String
+                        if (maxTemp == null) {
+                            maxTempString = "Loading"
+                        } else {
+                            if(celsius == false) {
+                                maxTempString = (maxTemp * 1.8 + 32).roundToInt().toString()
+                            }
+                            else{
+                                maxTempString = maxTemp.roundToInt().toString()
+                            }
                         }
+                        Text(
+                            text = "H: " + maxTempString + "°    " + "L: " + minTempString + "°",
+                            fontSize = 15.sp
+                        )
                     }
-                    var maxTemp: Double? =
-                        gridpointProperties?.properties?.maxTemperature?.values?.get(0)?.value
-                    var maxTempString: String
-                    if (maxTemp == null) {
-                        maxTempString = "Loading"
-                    } else {
-                        if(celsius == false) {
-                            maxTempString = (maxTemp * 1.8 + 32).roundToInt().toString()
-                        }
-                        else{
-                            maxTempString = maxTemp.roundToInt().toString()
-                        }
-                    }
-                    Text(
-                        text = "H: " + maxTempString + "°    " + "L: " + minTempString + "°",
-                        fontSize = 15.sp
-                    )
-
                 }
             }
         }
@@ -698,10 +703,10 @@ fun hourly(viewModel: MainViewModel){
         Row(
             modifier = Modifier.padding(20.dp)
         ) {
-            if(celsius == false){
-                forecastHourly?.let {
-                    for (i in 0..13) {
-                        if(it.propertiesInForecast?.period?.isNotEmpty() == true){
+            forecastHourly?.let {
+                if(it.propertiesInForecast?.period?.isNotEmpty() == true){
+                    if(celsius == false){
+                        for (i in 0..13) {
                             var allTimeStuff: String = it.propertiesInForecast?.period?.get(i)?.startTime.toString()
                             var ending = "AM"
                             allTimeStuff = allTimeStuff.substring(11, 13)
@@ -741,57 +746,54 @@ fun hourly(viewModel: MainViewModel){
                                 }
                             }
                         }
-                    }
-                }
-            } else {
-                forecastHourly?.let {
-                    for (i in 0..13) {
-                        var allTimeStuff: String = it.propertiesInForecast?.period?.get(i)?.startTime.toString()
-                        var ending = "AM"
-                        allTimeStuff = allTimeStuff.substring(11, 13)
-                        if(allTimeStuff.toInt() > 11){
-                            ending = "PM"
-                        }
-                        if(allTimeStuff.toInt() % 12 == 0){
-                            allTimeStuff = "12"
-                        }
-                        else
-                        {
-                            allTimeStuff = (allTimeStuff.toInt() % 12).toString()
-                        }
-                        if(i == 0){
-                            ending = ""
-                            allTimeStuff = "Now"
-                        }
-                        Column() {
-                            Row(modifier = Modifier.padding(7.dp)) {
-                                Text(text = "$allTimeStuff",
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 24.sp
-                                    //fontWeight = FontWeight.Bold
-                                )
-                                Text(text = "$ending",
-                                    //textAlign = TextAlign.Center,
-                                    fontSize = 15.sp,
-                                    modifier = Modifier.offset(0.dp, 9.dp)
-                                )
+                    } else {
+                        for (i in 0..13) {
+                            var allTimeStuff: String = it.propertiesInForecast?.period?.get(i)?.startTime.toString()
+                            var ending = "AM"
+                            allTimeStuff = allTimeStuff.substring(11, 13)
+                            if(allTimeStuff.toInt() > 11){
+                                ending = "PM"
                             }
-                            Row(modifier = Modifier.padding(0.dp)) {
-                                var temperature2 = it.propertiesInForecast?.period?.get(i)?.temperature?.toDouble()
-                                if (temperature2 != null) {
-                                    temperature2 = ((temperature2 - 32) * (0.5555))
+                            if(allTimeStuff.toInt() % 12 == 0){
+                                allTimeStuff = "12"
+                            }
+                            else
+                            {
+                                allTimeStuff = (allTimeStuff.toInt() % 12).toString()
+                            }
+                            if(i == 0){
+                                ending = ""
+                                allTimeStuff = "Now"
+                            }
+                            Column() {
+                                Row(modifier = Modifier.padding(7.dp)) {
+                                    Text(text = "$allTimeStuff",
+                                        textAlign = TextAlign.Center,
+                                        fontSize = 24.sp
+                                        //fontWeight = FontWeight.Bold
+                                    )
+                                    Text(text = "$ending",
+                                        //textAlign = TextAlign.Center,
+                                        fontSize = 15.sp,
+                                        modifier = Modifier.offset(0.dp, 9.dp)
+                                    )
                                 }
-                                Text(text = temperature2?.roundToInt().toString() + "°C   ",
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.offset(5.dp, 0.dp),
-                                    fontSize = 24.sp
-                                )
+                                Row(modifier = Modifier.padding(0.dp)) {
+                                    var temperature2 = it.propertiesInForecast?.period?.get(i)?.temperature?.toDouble()
+                                    if (temperature2 != null) {
+                                        temperature2 = ((temperature2 - 32) * (0.5555))
+                                    }
+                                    Text(text = temperature2?.roundToInt().toString() + "°C   ",
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.offset(5.dp, 0.dp),
+                                        fontSize = 24.sp
+                                    )
+                                }
                             }
                         }
                     }
                 }
             } ?: Text(text = "Loading...")
-
         }
     }
 }

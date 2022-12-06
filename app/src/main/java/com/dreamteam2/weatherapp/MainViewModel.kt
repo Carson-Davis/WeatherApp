@@ -116,15 +116,16 @@ class MainViewModel: ViewModel() {
         }.onSuccess {
             loadStatus.value = LoadStatus.success
             coordinates.value = it
+            getStatus()
+            getGridEndpoints()
+            getDailyForecast()
+            getHourlyForecast()
+            getGridpointProperties()
         }.onFailure {
             loadStatus.value = LoadStatus.error
             coordinates.value = null
         }
-        getStatus()
-        getGridEndpoints()
-        getDailyForecast()
-        getHourlyForecast()
-        getGridpointProperties()
+
     }
 //    suspend fun fetchByCoordinates(lat : Double, long : Double){
 //        kotlin.runCatching {
