@@ -237,6 +237,7 @@ fun homeScreen(viewModel: MainViewModel){
     val loadStatus by viewModel.loadStatus.collectAsState()
     val status by viewModel.status.collectAsState()
     val forecastHourly by viewModel.forecastHourly.collectAsState()
+    val foreCastPointEndpointTemperature by viewModel.forecast.collectAsState()
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -244,7 +245,10 @@ fun homeScreen(viewModel: MainViewModel){
         .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (loadStatus == MainViewModel.LoadStatus.success && !forecastHourly?.propertiesInForecast?.period?.isEmpty()!!) {
+        if (loadStatus == MainViewModel.LoadStatus.success
+            && forecastHourly?.propertiesInForecast?.period?.isNotEmpty()!!
+            && foreCastPointEndpointTemperature?.propertiesInForecast?.period?.isNotEmpty()!!
+        ) {
             today(viewModel)
             Spacer(modifier = Modifier.height(15.dp))
             hourly(viewModel)
