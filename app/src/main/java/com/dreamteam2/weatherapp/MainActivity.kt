@@ -453,9 +453,6 @@ fun searchbar(viewModel: MainViewModel){
             value = searchTextState.value,
             onValueChange = { value ->
                 searchTextState.value = value
-                runBlocking {
-                    viewModel.fetchByString(searchString = searchTextState.value.toString())
-                }
             },
             placeholder = {
                 Text(
@@ -497,7 +494,7 @@ fun searchbar(viewModel: MainViewModel){
             shape = RectangleShape, // The TextFiled has rounded corners top left and right by default
             colors = TextFieldDefaults.textFieldColors(
                 textColor = Color.Black,
-                cursorColor = Color.Black,
+                cursorColor = Color.White,
                 leadingIconColor = Color.Black,
                 trailingIconColor = Color.Black,
                 backgroundColor = Color.Transparent,
