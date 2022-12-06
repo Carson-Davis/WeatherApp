@@ -28,7 +28,9 @@ class MainViewModel: ViewModel() {
     var long = MutableStateFlow<Double?>(0.0)
     private val coordinatesApi = CoordinatesAPI()
     val coordinates = MutableStateFlow<List<CoordinatesData>?>(null)
+    val coordinatesData = MutableStateFlow<CoordinatesData?>(null)
     val isCelsius = MutableStateFlow<Boolean?>(false)
+
 
     suspend fun getStatus(){
         //Call to WeatherAPI for the current status of the API
@@ -103,5 +105,20 @@ class MainViewModel: ViewModel() {
         getGridpointProperties()
     }
 
+    suspend fun fetchByCoordinates(lat : String, long : String){
+        //Call to CoordinatesAPI for the city and state
+        kotlin.runCatching {
+            coordinatesApi.getCoordinates("$lat, $long")
+        }.onSuccess {
+            coordinates.value = it
+        }.onFailure {
+            coordinates.value = null
+        }
+        getStatus()
+        getGridEndpoints()
+        getDailyForecast()
+        getHourlyForecast()
+        getGridpointProperties()
+    }
 }
 

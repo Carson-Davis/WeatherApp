@@ -58,10 +58,6 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import kotlin.math.roundToLong
 
-
-var lat : Double = 0.0
-var long : Double = 0.0
-
 /*
 MainActivity
 -------------------------------------------------------------
@@ -206,6 +202,13 @@ fun mainLayout(viewModel: MainViewModel){
                 ){
                     searchbar(viewModel)
                 }
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                ){
+                    currLocationButton(viewModel)
+                }
+
             }
         },
         bottomBar = {
@@ -258,6 +261,10 @@ fun locs(viewModel: MainViewModel, context: Context, navController: NavControlle
     var list: ArrayList<com.dreamteam2.weatherapp.Location>? = ArrayList<com.dreamteam2.weatherapp.Location>()
     list?.add(firsPer)
      */
+    var files: Array<String> = context.fileList()
+    if(!files.contains("savedLocs.txt")){
+        saveToInternalStorage(context, "")
+    }
     var locations: String = readFromInternalStorage(context)
     var locArray: ArrayList<String> = ArrayList()
     if (locations != ""){
@@ -273,36 +280,77 @@ fun locs(viewModel: MainViewModel, context: Context, navController: NavControlle
         .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally) {
                 for (str:String in locArray){
-                    locButton(viewModel, str, navController)
+                    locButton(viewModel, str, navController, context)
                 }
+        Spacer(modifier = Modifier.height(50.dp))
             }
 
 }
 
 @Composable
-fun locButton(viewModel: MainViewModel, name: String, navController: NavController){
+fun locButton(viewModel: MainViewModel, name: String, navController: NavController, context: Context){
     val coordinates by viewModel.coordinates.collectAsState()
     Button(modifier = Modifier
         .fillMaxSize()
         .height(IntrinsicSize.Max)
         .padding(15.dp),
         onClick = {
-                  runBlocking {
-                      viewModel.fetchByString(name)
-                  }
+            runBlocking {
+                viewModel.fetchByString(name)
+            }
             navController.navigate("home")
         },
         border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
-        shape = RoundedCornerShape(50),
+        shape = RoundedCornerShape(10),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.primaryVariant)
-                /*
+        /*
+colors = ButtonDefaults.buttonColors(
+    backgroundColor = MaterialTheme.colors.primaryVariant,
+    contentColor = Color.Black)
+
+         */
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(textAlign = TextAlign.Center, text = name, fontSize = 30.sp, modifier = Modifier.padding(15.dp))
+            Button(
+                onClick = {
+                    var saveStr:String = readFromInternalStorage(context)
+                    saveStr = saveStr.replace(name, "")
+                    saveToInternalStorage(context, saveStr)
+                    navController.navigate("home")
+                },
+                border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.primaryVariant)) {
+                Text(textAlign = TextAlign.Center, text = "Delete", fontSize = 30.sp, modifier = Modifier.padding(10.dp))
+            }
+        }
+    }
+}
+
+
+
+@Composable
+fun currLocationButton(viewModel : MainViewModel){
+    val lat by viewModel.lat.collectAsState()
+    val long by viewModel.long.collectAsState()
+    Button(modifier = Modifier
+        .width(100.dp)
+        .height(IntrinsicSize.Min),
+        onClick = {
+            /*
+            *  TODO: Make this button change the location in the search bar to the devices current
+            *  location and change the information displayed to the same
+            **/
+//            LaunchedEffect(true){
+//                viewModel.fetchByCoordinates(lat.toString(), long.toString())
+//            }
+        },
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.colors.primaryVariant,
-            contentColor = Color.Black)
-
-                 */
+            contentColor = Color.White)
     ) {
-        Text(textAlign = TextAlign.Center, text = name, fontSize = 30.sp, modifier = Modifier.padding(10.dp))
+        Text(textAlign = TextAlign.Center, text = "Current Location", fontSize = 10.sp)
     }
 }
 
@@ -333,7 +381,7 @@ fun searchbar(viewModel: MainViewModel){
     val searchTextState = remember { mutableStateOf(TextFieldValue("")) }
     Row(
         modifier = Modifier
-            .fillMaxWidth()
+            .width(350.dp)
             .height(IntrinsicSize.Min)
     ) {
         TextField(
@@ -790,6 +838,11 @@ fun saveLocation(viewModel: MainViewModel){
             .padding(15.dp),
             onClick = {
 
+                var files: Array<String> = context.fileList()
+                if(!files.contains("savedLocs.txt")){
+                    saveToInternalStorage(context, "")
+                }
+
                 var saveStr:String = readFromInternalStorage(context)
                 try {
                     if (!saveStr.contains(coordinates?.get(0)?.displayName.toString())) {
@@ -820,6 +873,7 @@ fun saveToInternalStorage(context: Context, msg: String) {
         fos.flush()
         fos.close()
      }
+
 
 fun readFromInternalStorage(context: Context): String {
 
