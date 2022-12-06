@@ -16,6 +16,9 @@ class MainViewModel: ViewModel() {
 
     private val weatherApi = WeatherApi()
 
+    /**
+     * Design pattern implementation - State
+     */
     val status = MutableStateFlow<Status?>(null)
     val gridPointEndpoints = MutableStateFlow<GridPointEndpoints?>(null)
     val forecast = MutableStateFlow<Forecast?>(null)
