@@ -203,6 +203,7 @@ fun mainLayout(viewModel: MainViewModel){
                     modifier = Modifier
                         .weight(1f)
                         .wrapContentWidth(Alignment.Start)
+                        .fillMaxWidth()
                 ){
                     searchbar(viewModel)
                 }
@@ -232,26 +233,70 @@ fun mainLayout(viewModel: MainViewModel){
 
 @Composable
 fun homeScreen(viewModel: MainViewModel){
+
+    val loadStatus by viewModel.loadStatus.collectAsState()
+    val status by viewModel.status.collectAsState()
+    val forecastHourly by viewModel.forecastHourly.collectAsState()
+
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(20.dp)
         .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        today(viewModel)
-        Spacer(modifier = Modifier.height(15.dp))
-        hourly(viewModel)
-        Spacer(modifier = Modifier.height(15.dp))
-        dailyForecast(viewModel)
-        Spacer(modifier = Modifier.height(15.dp))
-        bottom(viewModel)
-        Spacer(modifier = Modifier.height(15.dp))
-        //readFromInternalStorage(context = LocalContext.current)
-        //Spacer(modifier = Modifier.height(15.dp))
-        saveLocation(viewModel)
-        Spacer(modifier = Modifier.height(15.dp))
-        temperatureButton(viewModel)
-        Spacer(modifier = Modifier.height(50.dp))
+        if (loadStatus == MainViewModel.LoadStatus.success && !forecastHourly?.propertiesInForecast?.period?.isEmpty()!!) {
+            today(viewModel)
+            Spacer(modifier = Modifier.height(15.dp))
+            hourly(viewModel)
+            Spacer(modifier = Modifier.height(15.dp))
+            dailyForecast(viewModel)
+            Spacer(modifier = Modifier.height(15.dp))
+            bottom(viewModel)
+            Spacer(modifier = Modifier.height(15.dp))
+            //readFromInternalStorage(context = LocalContext.current)
+            //Spacer(modifier = Modifier.height(15.dp))
+            saveLocation(viewModel)
+            Spacer(modifier = Modifier.height(15.dp))
+            temperatureButton(viewModel)
+            Spacer(modifier = Modifier.height(50.dp))
+        }else if (loadStatus == MainViewModel.LoadStatus.error){
+            Text(
+                text = "Please Choose Location...",
+                textAlign = TextAlign.Center,
+                fontSize = 30.sp,
+                color = MaterialTheme.colors.primary
+            )
+        }else if (loadStatus == MainViewModel.LoadStatus.attempt){
+            Text(
+                text = "Loading...",
+                textAlign = TextAlign.Center,
+                fontSize = 30.sp,
+                color = MaterialTheme.colors.primary
+            )
+        }else {
+            if (status == null) {
+                Text(
+                    text = "Connection Error...",
+                    textAlign = TextAlign.Center,
+                    fontSize = 30.sp,
+                    color = MaterialTheme.colors.primary
+                )
+            } else if (forecastHourly?.propertiesInForecast?.period?.isEmpty()!!) {
+                Text(
+                    text = "Invalid Location...",
+                    textAlign = TextAlign.Center,
+                    fontSize = 30.sp,
+                    color = MaterialTheme.colors.primary
+                )
+            } else {
+                Text(
+                    text = "Loading...",
+                    textAlign = TextAlign.Center,
+                    fontSize = 30.sp,
+                    color = MaterialTheme.colors.primary
+                )
+            }
+        }
 
     }
 }

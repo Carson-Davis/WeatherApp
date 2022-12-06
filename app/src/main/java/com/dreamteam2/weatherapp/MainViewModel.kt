@@ -31,38 +31,51 @@ class MainViewModel: ViewModel() {
     val coordinatesData = MutableStateFlow<CoordinatesData?>(null)
     val isCelsius = MutableStateFlow<Boolean?>(false)
 
+    var loadStatus = MutableStateFlow(LoadStatus.notStarted)
+    enum class LoadStatus{
+        attempt, error, success, notStarted
+    }
+
 
     suspend fun getStatus(){
         //Call to WeatherAPI for the current status of the API
         kotlin.runCatching {
+            loadStatus.value = LoadStatus.attempt
             weatherApi.getStatus()
         }.onSuccess {
+            loadStatus.value = LoadStatus.success
             status.value = it
         }.onFailure {
+            loadStatus.value = LoadStatus.error
             status.value = null
         }
     }
 
     suspend fun getGridEndpoints(){
         kotlin.runCatching {
+            loadStatus.value = LoadStatus.attempt
             weatherApi.getGirdEndpoints(
                 this.coordinates.value?.get(0)!!.lon?.toDouble()!!,
                 this.coordinates.value?.get(0)!!.lat?.toDouble()!!
             ) // 39.0473 -95.6752 vs 45.5648 -94.3180
         }.onSuccess {
+            loadStatus.value = LoadStatus.success
             gridPointEndpoints.value = it
-
         }.onFailure {
+            loadStatus.value = LoadStatus.error
             gridPointEndpoints.value = null
         }
     }
 
     suspend fun getDailyForecast(){
         kotlin.runCatching {
+            loadStatus.value = LoadStatus.attempt
             weatherApi.getForecast(this.gridPointEndpoints.value?.properties?.cwa!!, this.gridPointEndpoints.value?.properties?.gridX!!, this.gridPointEndpoints.value?.properties?.gridY!!) // TOP 31 80 vw MPX 72 98
         }.onSuccess {
+            loadStatus.value = LoadStatus.success
             forecast.value = it
         }.onFailure {
+            loadStatus.value = LoadStatus.error
             forecast.value = null
         }
     }
@@ -70,10 +83,13 @@ class MainViewModel: ViewModel() {
     suspend fun getHourlyForecast(){
         //Call to WeatherAPI which fetches the hourly forecast
         kotlin.runCatching {
+            loadStatus.value = LoadStatus.attempt
             weatherApi.getForecastHourly(this.gridPointEndpoints.value?.properties?.cwa!!, this.gridPointEndpoints.value?.properties?.gridX!!, this.gridPointEndpoints.value?.properties?.gridY!!)
         }.onSuccess {
+            loadStatus.value = LoadStatus.success
             forecastHourly.value = it
         }.onFailure {
+            loadStatus.value = LoadStatus.error
             forecastHourly.value = null
         }
     }
@@ -81,10 +97,13 @@ class MainViewModel: ViewModel() {
     suspend fun getGridpointProperties(){
         //Call to WeatherAPI that gets the properties of a gridpoint
         kotlin.runCatching {
+            loadStatus.value = LoadStatus.attempt
             weatherApi.getGridpointProperties(this.gridPointEndpoints.value?.properties?.cwa!!, this.gridPointEndpoints.value?.properties?.gridX!!, this.gridPointEndpoints.value?.properties?.gridY!!)
         }.onSuccess {
+            loadStatus.value = LoadStatus.success
             gridpointsProperties.value = it
         }.onFailure {
+            loadStatus.value = LoadStatus.error
             gridpointsProperties.value = null
         }
     }
@@ -92,10 +111,13 @@ class MainViewModel: ViewModel() {
     suspend fun fetchByString(searchString: String){
         //Call to CoordinatesAPI for the city and state
         kotlin.runCatching {
+            loadStatus.value = LoadStatus.attempt
             coordinatesApi.getCoordinates(searchString)
         }.onSuccess {
+            loadStatus.value = LoadStatus.success
             coordinates.value = it
         }.onFailure {
+            loadStatus.value = LoadStatus.error
             coordinates.value = null
         }
         getStatus()
