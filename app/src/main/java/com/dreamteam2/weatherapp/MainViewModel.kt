@@ -21,8 +21,8 @@ class MainViewModel: ViewModel() {
     val forecast = MutableStateFlow<Forecast?>(null)
     val forecastHourly =  MutableStateFlow<Forecast?>(null)
     val gridpointsProperties = MutableStateFlow<Gridpoints?>(null)
-    var lat = MutableStateFlow<Double?>(0.0)
-    var long = MutableStateFlow<Double?>(0.0)
+    var lat = MutableStateFlow<Double>(0.0)
+    var long = MutableStateFlow<Double>(0.0)
     private val coordinatesApi = CoordinatesAPI()
     val coordinates = MutableStateFlow<List<CoordinatesData>?>(null)
     val coordinatesData = MutableStateFlow<CoordinatesData?>(null)
@@ -102,20 +102,19 @@ class MainViewModel: ViewModel() {
         getGridpointProperties()
     }
 
-    suspend fun fetchByCoordinates(lat : String, long : String){
-        //Call to CoordinatesAPI for the city and state
+    suspend fun fetchByCoordinates(lat : Double, long : Double){
         kotlin.runCatching {
-            coordinatesApi.getCoordinates("$lat, $long")
+            weatherApi.getGirdEndpoints(long, lat)
         }.onSuccess {
-            coordinates.value = it
+            gridPointEndpoints.value = it
+            getStatus()
+            getDailyForecast()
+            getHourlyForecast()
+            getGridpointProperties()
         }.onFailure {
-            coordinates.value = null
+            gridPointEndpoints.value = null
         }
-        getStatus()
-        getGridEndpoints()
-        getDailyForecast()
-        getHourlyForecast()
-        getGridpointProperties()
+
     }
 }
 
