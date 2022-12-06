@@ -282,6 +282,7 @@ fun locs(viewModel: MainViewModel, context: Context, navController: NavControlle
                 for (str:String in locArray){
                     locButton(viewModel, str, navController, context)
                 }
+        Spacer(modifier = Modifier.height(50.dp))
             }
 
 }
