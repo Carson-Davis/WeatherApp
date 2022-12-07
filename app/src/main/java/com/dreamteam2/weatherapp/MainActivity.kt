@@ -353,17 +353,18 @@ fun locButton(viewModel: MainViewModel, name: String, navController: NavControll
         .fillMaxSize()
         .height(IntrinsicSize.Max)
         .padding(15.dp),
+
         onClick = {
+            navController.navigate("home")
             runBlocking {
                 viewModel.fetchByString(name)
             }
-            navController.navigate("home")
+
         },
         //border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
         shape = RoundedCornerShape(10),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = MaterialTheme.colors.primaryVariant,
-            contentColor = Color.Black)
+            backgroundColor = MaterialTheme.colors.primaryVariant, contentColor = MaterialTheme.colors.secondary)
         /*
 colors = ButtonDefaults.buttonColors(
     backgroundColor = MaterialTheme.colors.primaryVariant,
@@ -385,10 +386,10 @@ colors = ButtonDefaults.buttonColors(
                     pressedElevation = 15.dp,
                     disabledElevation = 0.dp),
                 shape = RoundedCornerShape(50),
-                border = BorderStroke(1.dp,Color.Black),
+                border = BorderStroke(1.dp,MaterialTheme.colors.secondary),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.colors.primaryVariant,
-                    contentColor = Color.Black)) {
+                    contentColor = MaterialTheme.colors.secondary)) {
                 Text(textAlign = TextAlign.Center, text = "Delete", fontSize = 30.sp, modifier = Modifier.padding(10.dp))
             }
         }
@@ -688,7 +689,7 @@ fun today(viewModel: MainViewModel){
  *
  * @param MainViewModel
  *
- * Design pattern implementation - State
+ * Design pattern implementation -
  */
 @Composable
 fun hourly(viewModel: MainViewModel){
@@ -924,7 +925,7 @@ fun saveLocation(viewModel: MainViewModel){
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.colors.primaryVariant,
-                contentColor = Color.Black
+                contentColor = MaterialTheme.colors.secondary
             )
         ) {
             Text(textAlign = TextAlign.Center, text = "Save Location", fontSize = 20.sp)
@@ -1079,7 +1080,7 @@ fun temperatureButton(viewModel: MainViewModel) {
         shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.colors.primaryVariant,
-            contentColor = Color.Black
+            contentColor = MaterialTheme.colors.secondary
         ),
         modifier = Modifier.height(40.dp).width(130.dp)){
         if(celsius == false) {
