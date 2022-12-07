@@ -353,17 +353,18 @@ fun locButton(viewModel: MainViewModel, name: String, navController: NavControll
         .fillMaxSize()
         .height(IntrinsicSize.Max)
         .padding(15.dp),
+
         onClick = {
+            navController.navigate("home")
             runBlocking {
                 viewModel.fetchByString(name)
             }
-            navController.navigate("home")
+
         },
         //border = BorderStroke(4.dp, MaterialTheme.colors.primaryVariant),
         shape = RoundedCornerShape(10),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = MaterialTheme.colors.primaryVariant,
-            contentColor = Color.Black)
+            backgroundColor = MaterialTheme.colors.primaryVariant, contentColor = MaterialTheme.colors.secondary)
         /*
 colors = ButtonDefaults.buttonColors(
     backgroundColor = MaterialTheme.colors.primaryVariant,
@@ -385,10 +386,10 @@ colors = ButtonDefaults.buttonColors(
                     pressedElevation = 15.dp,
                     disabledElevation = 0.dp),
                 shape = RoundedCornerShape(50),
-                border = BorderStroke(1.dp,Color.Black),
+                border = BorderStroke(1.dp,MaterialTheme.colors.secondary),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.colors.primaryVariant,
-                    contentColor = Color.Black)) {
+                    contentColor = MaterialTheme.colors.secondary)) {
                 Text(textAlign = TextAlign.Center, text = "Delete", fontSize = 30.sp, modifier = Modifier.padding(10.dp))
             }
         }
@@ -863,7 +864,7 @@ fun bottom(viewModel: MainViewModel){
             dataRow("Humidity", gridpointProperties?.properties?.relativeHumidity?.values?.get(0)?.value.toString() + " %")
             var dewpoint: Long? =
                 gridpointProperties?.properties?.dewpoint?.values?.get(0)?.value?.roundToLong()
-            var dewpointString: String
+            var dewpointString: String = ""
             if (dewpoint == null) {
                 dewpointString = "Loading"
             } else {
@@ -871,8 +872,8 @@ fun bottom(viewModel: MainViewModel){
                     dewpointString = dewpoint.toString()
                 }
                 else{
-                    dewpointString = ((dewpoint * 1.8) + 32).toString()
-
+                    val dewpoint2: Int? = ((((dewpoint * 100.0).roundToInt() / 100.0) * 1.8) + 32).roundToInt()
+                    dewpointString = dewpoint2.toString()
                 }
             }
             if(celsius == true) {
@@ -888,6 +889,7 @@ fun bottom(viewModel: MainViewModel){
         }
     }
 }
+
 
 @Composable
 fun saveLocation(viewModel: MainViewModel){
@@ -924,7 +926,7 @@ fun saveLocation(viewModel: MainViewModel){
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.colors.primaryVariant,
-                contentColor = Color.Black
+                contentColor = MaterialTheme.colors.secondary
             )
         ) {
             Text(textAlign = TextAlign.Center, text = "Save Location", fontSize = 20.sp)
@@ -1079,7 +1081,7 @@ fun temperatureButton(viewModel: MainViewModel) {
         shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.colors.primaryVariant,
-            contentColor = Color.Black
+            contentColor = MaterialTheme.colors.secondary
         ),
         modifier = Modifier.height(40.dp).width(130.dp)){
         if(celsius == false) {
