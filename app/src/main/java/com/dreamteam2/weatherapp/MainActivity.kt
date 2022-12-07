@@ -689,7 +689,7 @@ fun today(viewModel: MainViewModel){
  *
  * @param MainViewModel
  *
- * Design pattern implementation -
+ * Design pattern implementation - State
  */
 @Composable
 fun hourly(viewModel: MainViewModel){
