@@ -864,7 +864,7 @@ fun bottom(viewModel: MainViewModel){
             dataRow("Humidity", gridpointProperties?.properties?.relativeHumidity?.values?.get(0)?.value.toString() + " %")
             var dewpoint: Long? =
                 gridpointProperties?.properties?.dewpoint?.values?.get(0)?.value?.roundToLong()
-            var dewpointString: String
+            var dewpointString: String = ""
             if (dewpoint == null) {
                 dewpointString = "Loading"
             } else {
@@ -872,8 +872,8 @@ fun bottom(viewModel: MainViewModel){
                     dewpointString = dewpoint.toString()
                 }
                 else{
-                    dewpointString = ((dewpoint * 1.8) + 32).toString()
-
+                    val dewpoint2: Int? = ((((dewpoint * 100.0).roundToInt() / 100.0) * 1.8) + 32).roundToInt()
+                    dewpointString = dewpoint2.toString()
                 }
             }
             if(celsius == true) {
@@ -889,6 +889,7 @@ fun bottom(viewModel: MainViewModel){
         }
     }
 }
+
 
 @Composable
 fun saveLocation(viewModel: MainViewModel){
